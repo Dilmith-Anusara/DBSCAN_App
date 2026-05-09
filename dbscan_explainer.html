@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBSCAN Step-by-Step Visualization</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #090c10;
+  --surface: #111419;
+  --surface2: #191d24;
+  --border: #252a33;
+  --border2: #2e3440;
+  --text: #cdd6e0;
+  --muted: #637080;
+  --cyan: #00d4ff;
+  --green: #3fb950;
+  --red: #f04040;
+  --blue: #4d9de0;
+  --amber: #f5a623;
+  --teal: #22d3ee;
+  --gray: #5a6474;
+  --white: #eaf0f8;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 40px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+h1 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.subtitle {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.main-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  justify-content: center;
+  max-width: 1240px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+/* ── VIZ PANEL ── */
+.viz-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  flex-shrink: 0;
+}
+
+svg {
+  display: block;
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+/* SVG elements */
+.point-circle {
+  fill: var(--surface2);
+  stroke: var(--border2);
+  stroke-width: 2;
+  transition: fill 0.35s ease, stroke 0.35s ease, r 0.35s ease, filter 0.35s ease, opacity 0.35s ease;
+}
+.epsilon-circle {
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 1.8;
+  stroke-dasharray: 7 5;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.epsilon-circle.visible { opacity: 0.5; }
+
+.connection-line {
+  stroke: var(--muted);
+  stroke-width: 1;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.connection-line.visible { opacity: 0.22; }
+
+.density-line {
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.density-line.visible { opacity: 1; }
+
+.label-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  fill: var(--white);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.label-text.visible { opacity: 1; }
+
+/* Point state colors via data-state */
+.point[data-state="unvisited"] .point-circle { fill: var(--surface2); stroke: var(--border2); }
+.point[data-state="active"]    .point-circle { fill: var(--surface2); stroke: var(--cyan); stroke-width: 2.5; }
+.point[data-state="frontier"]  .point-circle { fill: var(--green); stroke: var(--green); }
+.point[data-state="core"]      .point-circle { fill: var(--red); stroke: var(--red); }
+.point[data-state="border"]    .point-circle { fill: var(--blue); stroke: var(--blue); }
+.point[data-state="c1"]        .point-circle { fill: var(--amber); stroke: var(--amber); }
+.point[data-state="c2"]        .point-circle { fill: var(--teal); stroke: var(--teal); }
+.point[data-state="noise"]     .point-circle { fill: var(--gray); stroke: var(--gray); }
+
+.point[data-dim="true"] .point-circle { opacity: 0.18; }
+.point[data-highlight="true"] .point-circle { filter: drop-shadow(0 0 5px currentColor); opacity: 1; }
+
+/* Pulsing active ring */
+@keyframes pulseRing {
+  0%, 100% { r: 7; }
+  50% { r: 10; }
+}
+.point[data-pulsing="true"] .point-circle {
+  animation: pulseRing 1.2s infinite ease-in-out;
+}
+
+/* ── CONTROLS ── */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  justify-content: center;
+}
+button {
+  font-family: 'JetBrains Mono', monospace;
+  padding: 9px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, opacity 0.2s;
+  letter-spacing: 0.02em;
+}
+button:active:not(:disabled) { transform: scale(0.97); }
+.btn-prev {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+}
+.btn-prev:hover:not(:disabled) { background: var(--border2); }
+.btn-next {
+  background: #1e6f35;
+  color: #fff;
+  border: 1px solid #2a8e44;
+}
+.btn-next:hover:not(:disabled) { background: #258540; }
+button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.progress {
+  display: flex;
+  gap: 4px;
+}
+.progress-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border2);
+  transition: background 0.3s, transform 0.3s;
+}
+.progress-dot.active { background: var(--cyan); transform: scale(1.4); }
+.progress-dot.done { background: var(--green); }
+
+/* ── INFO PANEL ── */
+.info-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px;
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.step-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.step-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+.step-desc {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.75;
+  flex: 1;
+}
+.step-desc strong { color: var(--white); font-weight: 600; }
+.step-desc .hl-core   { color: var(--red);   font-weight: 600; }
+.step-desc .hl-border { color: var(--blue);  font-weight: 600; }
+.step-desc .hl-c1     { color: var(--amber); font-weight: 600; }
+.step-desc .hl-c2     { color: var(--teal);  font-weight: 600; }
+.step-desc .hl-noise  { color: var(--gray);  font-weight: 600; }
+.step-desc .hl-cyan   { color: var(--cyan);  font-weight: 600; }
+.step-desc .hl-green  { color: var(--green); font-weight: 600; }
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 18px 0;
+}
+
+.params-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 0;
+}
+.param-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.param-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 3px;
+}
+.param-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cyan);
+}
+
+/* Legend */
+.legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+}
+.ld-unvisited { background: var(--surface2); border-color: var(--border2); }
+.ld-active    { background: var(--surface2); border-color: var(--cyan); }
+.ld-frontier  { background: var(--green); border-color: var(--green); }
+.ld-core      { background: var(--red);   border-color: var(--red);   }
+.ld-border    { background: var(--blue);  border-color: var(--blue);  }
+.ld-c1        { background: var(--amber); border-color: var(--amber); }
+.ld-c2        { background: var(--teal);  border-color: var(--teal);  }
+.ld-noise     { background: var(--gray);  border-color: var(--gray);  }
+.ld-epsilon   { background: transparent; border-color: var(--cyan); border-style: dashed; }
+
+.hint {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 10px;
+  opacity: 0.6;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>▸ DBSCAN Step-by-Step</h1>
+  <div class="subtitle">Density-Based Spatial Clustering of Applications with Noise</div>
+</header>
+
+<div class="main-container">
+
+  <!-- VIZ -->
+  <div class="viz-panel">
+    <svg id="viz" width="780" height="420" viewBox="0 0 780 420">
+
+      <!-- Cluster 1 connection lines -->
+      <line class="connection-line" id="conn-0-1"  x1="220" y1="230" x2="250" y2="210"/>
+      <line class="connection-line" id="conn-0-2"  x1="220" y1="230" x2="250" y2="250"/>
+      <line class="connection-line" id="conn-0-3"  x1="220" y1="230" x2="220" y2="270"/>
+      <line class="connection-line" id="conn-0-4"  x1="220" y1="230" x2="190" y2="250"/>
+      <line class="connection-line" id="conn-0-5"  x1="220" y1="230" x2="190" y2="210"/>
+      <line class="connection-line" id="conn-1-2"  x1="250" y1="210" x2="250" y2="250"/>
+      <line class="connection-line" id="conn-1-5"  x1="250" y1="210" x2="190" y2="210"/>
+      <line class="connection-line" id="conn-1-6"  x1="250" y1="210" x2="290" y2="190"/>
+      <line class="connection-line" id="conn-2-3"  x1="250" y1="250" x2="220" y2="270"/>
+      <line class="connection-line" id="conn-2-7"  x1="250" y1="250" x2="290" y2="270"/>
+      <line class="connection-line" id="conn-3-4"  x1="220" y1="270" x2="190" y2="250"/>
+      <line class="connection-line" id="conn-3-8"  x1="220" y1="270" x2="220" y2="310"/>
+      <line class="connection-line" id="conn-4-5"  x1="190" y1="250" x2="190" y2="210"/>
+      <line class="connection-line" id="conn-4-9"  x1="190" y1="250" x2="150" y2="270"/>
+      <line class="connection-line" id="conn-5-10" x1="190" y1="210" x2="150" y2="190"/>
+      <line class="connection-line" id="conn-5-11" x1="190" y1="210" x2="220" y2="180"/>
+      <line class="connection-line" id="conn-0-11" x1="220" y1="230" x2="220" y2="180"/>
+
+      <!-- Cluster 2 connection lines -->
+      <line class="connection-line" id="conn-12-13" x1="560" y1="230" x2="590" y2="210"/>
+      <line class="connection-line" id="conn-12-14" x1="560" y1="230" x2="590" y2="250"/>
+      <line class="connection-line" id="conn-12-15" x1="560" y1="230" x2="560" y2="270"/>
+      <line class="connection-line" id="conn-12-16" x1="560" y1="230" x2="530" y2="250"/>
+      <line class="connection-line" id="conn-12-17" x1="560" y1="230" x2="530" y2="210"/>
+      <line class="connection-line" id="conn-12-23" x1="560" y1="230" x2="560" y2="180"/>
+      <line class="connection-line" id="conn-13-14" x1="590" y1="210" x2="590" y2="250"/>
+      <line class="connection-line" id="conn-13-17" x1="590" y1="210" x2="530" y2="210"/>
+      <line class="connection-line" id="conn-13-18" x1="590" y1="210" x2="630" y2="190"/>
+      <line class="connection-line" id="conn-14-15" x1="590" y1="250" x2="560" y2="270"/>
+      <line class="connection-line" id="conn-14-19" x1="590" y1="250" x2="630" y2="270"/>
+      <line class="connection-line" id="conn-15-16" x1="560" y1="270" x2="530" y2="250"/>
+      <line class="connection-line" id="conn-15-20" x1="560" y1="270" x2="560" y2="310"/>
+      <line class="connection-line" id="conn-16-17" x1="530" y1="250" x2="530" y2="210"/>
+      <line class="connection-line" id="conn-16-21" x1="530" y1="250" x2="490" y2="270"/>
+      <line class="connection-line" id="conn-17-22" x1="530" y1="210" x2="490" y2="190"/>
+      <line class="connection-line" id="conn-17-23" x1="530" y1="210" x2="560" y2="180"/>
+
+      <!-- Density-reachability highlight lines -->
+      <!-- Step 12 (directly density-reachable): p1 → p6 -->
+      <line class="density-line" id="dl-1-6"   x1="250" y1="210" x2="290" y2="190" stroke="#00d4ff"/>
+      <!-- Step 13 (density-reachable): p0 → p1 → p2 -->
+      <line class="density-line" id="dl-0-1"   x1="220" y1="230" x2="250" y2="210" stroke="#f5a623"/>
+      <line class="density-line" id="dl-1-2"   x1="250" y1="210" x2="250" y2="250" stroke="#f5a623"/>
+      <!-- Step 14 (density-connected via p0): p6←p1←p0→p2→p7 -->
+      <line class="density-line" id="dl-0-1b"  x1="220" y1="230" x2="250" y2="210" stroke="#3fb950"/>
+      <line class="density-line" id="dl-1-6b"  x1="250" y1="210" x2="290" y2="190" stroke="#3fb950"/>
+      <line class="density-line" id="dl-0-2"   x1="220" y1="230" x2="250" y2="250" stroke="#3fb950"/>
+      <line class="density-line" id="dl-2-7"   x1="250" y1="250" x2="290" y2="270" stroke="#3fb950"/>
+
+      <!-- Epsilon circles -->
+      <circle class="epsilon-circle" id="eps-0"  cx="220" cy="230" r="45"/>
+      <circle class="epsilon-circle" id="eps-1"  cx="250" cy="210" r="45"/>
+      <circle class="epsilon-circle" id="eps-2"  cx="250" cy="250" r="45"/>
+      <circle class="epsilon-circle" id="eps-3"  cx="220" cy="270" r="45"/>
+      <circle class="epsilon-circle" id="eps-4"  cx="190" cy="250" r="45"/>
+      <circle class="epsilon-circle" id="eps-5"  cx="190" cy="210" r="45"/>
+      <circle class="epsilon-circle" id="eps-6"  cx="290" cy="190" r="45"/>
+      <circle class="epsilon-circle" id="eps-7"  cx="290" cy="270" r="45"/>
+      <circle class="epsilon-circle" id="eps-8"  cx="220" cy="310" r="45"/>
+      <circle class="epsilon-circle" id="eps-9"  cx="150" cy="270" r="45"/>
+      <circle class="epsilon-circle" id="eps-10" cx="150" cy="190" r="45"/>
+      <circle class="epsilon-circle" id="eps-11" cx="220" cy="180" r="45"/>
+      <circle class="epsilon-circle" id="eps-12" cx="560" cy="230" r="45"/>
+      <circle class="epsilon-circle" id="eps-13" cx="590" cy="210" r="45"/>
+      <circle class="epsilon-circle" id="eps-14" cx="590" cy="250" r="45"/>
+      <circle class="epsilon-circle" id="eps-15" cx="560" cy="270" r="45"/>
+      <circle class="epsilon-circle" id="eps-16" cx="530" cy="250" r="45"/>
+      <circle class="epsilon-circle" id="eps-17" cx="530" cy="210" r="45"/>
+      <circle class="epsilon-circle" id="eps-18" cx="630" cy="190" r="45"/>
+      <circle class="epsilon-circle" id="eps-19" cx="630" cy="270" r="45"/>
+      <circle class="epsilon-circle" id="eps-20" cx="560" cy="310" r="45"/>
+      <circle class="epsilon-circle" id="eps-21" cx="490" cy="270" r="45"/>
+      <circle class="epsilon-circle" id="eps-22" cx="490" cy="190" r="45"/>
+      <circle class="epsilon-circle" id="eps-23" cx="560" cy="180" r="45"/>
+      <circle class="epsilon-circle" id="eps-24" cx="390" cy="100" r="45"/>
+      <circle class="epsilon-circle" id="eps-25" cx="390" cy="360" r="45"/>
+      <circle class="epsilon-circle" id="eps-26" cx="80"  cy="150" r="45"/>
+      <circle class="epsilon-circle" id="eps-27" cx="80"  cy="310" r="45"/>
+      <circle class="epsilon-circle" id="eps-28" cx="700" cy="150" r="45"/>
+      <circle class="epsilon-circle" id="eps-29" cx="700" cy="310" r="45"/>
+
+      <!-- Point labels -->
+      <text class="label-text" id="label-0"  x="220" y="219" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-1"  x="250" y="199" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-2"  x="250" y="239" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-3"  x="220" y="259" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-4"  x="190" y="239" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-5"  x="190" y="199" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-6"  x="290" y="179" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-7"  x="290" y="259" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-8"  x="220" y="299" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-9"  x="150" y="259" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-10" x="150" y="179" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-11" x="220" y="169" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-12" x="560" y="219" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-13" x="590" y="199" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-14" x="590" y="239" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-15" x="560" y="259" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-16" x="530" y="239" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-17" x="530" y="199" text-anchor="middle">Core</text>
+      <text class="label-text" id="label-18" x="630" y="179" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-19" x="630" y="259" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-20" x="560" y="299" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-21" x="490" y="259" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-22" x="490" y="179" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-23" x="560" y="169" text-anchor="middle">Border</text>
+      <text class="label-text" id="label-24" x="390" y="89"  text-anchor="middle">Noise</text>
+      <text class="label-text" id="label-25" x="390" y="349" text-anchor="middle">Noise</text>
+      <text class="label-text" id="label-26" x="80"  y="139" text-anchor="middle">Noise</text>
+      <text class="label-text" id="label-27" x="80"  y="299" text-anchor="middle">Noise</text>
+      <text class="label-text" id="label-28" x="700" y="139" text-anchor="middle">Noise</text>
+      <text class="label-text" id="label-29" x="700" y="299" text-anchor="middle">Noise</text>
+
+      <!-- Points (30 total) -->
+      <!-- Cluster 1 core ring -->
+      <g class="point" id="point-0"  data-state="unvisited" transform="translate(220,230)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-1"  data-state="unvisited" transform="translate(250,210)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-2"  data-state="unvisited" transform="translate(250,250)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-3"  data-state="unvisited" transform="translate(220,270)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-4"  data-state="unvisited" transform="translate(190,250)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-5"  data-state="unvisited" transform="translate(190,210)"><circle class="point-circle" r="7"/></g>
+      <!-- Cluster 1 border ring -->
+      <g class="point" id="point-6"  data-state="unvisited" transform="translate(290,190)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-7"  data-state="unvisited" transform="translate(290,270)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-8"  data-state="unvisited" transform="translate(220,310)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-9"  data-state="unvisited" transform="translate(150,270)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-10" data-state="unvisited" transform="translate(150,190)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-11" data-state="unvisited" transform="translate(220,180)"><circle class="point-circle" r="7"/></g>
+      <!-- Cluster 2 core ring -->
+      <g class="point" id="point-12" data-state="unvisited" transform="translate(560,230)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-13" data-state="unvisited" transform="translate(590,210)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-14" data-state="unvisited" transform="translate(590,250)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-15" data-state="unvisited" transform="translate(560,270)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-16" data-state="unvisited" transform="translate(530,250)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-17" data-state="unvisited" transform="translate(530,210)"><circle class="point-circle" r="7"/></g>
+      <!-- Cluster 2 border ring -->
+      <g class="point" id="point-18" data-state="unvisited" transform="translate(630,190)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-19" data-state="unvisited" transform="translate(630,270)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-20" data-state="unvisited" transform="translate(560,310)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-21" data-state="unvisited" transform="translate(490,270)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-22" data-state="unvisited" transform="translate(490,190)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-23" data-state="unvisited" transform="translate(560,180)"><circle class="point-circle" r="7"/></g>
+      <!-- Isolated noise -->
+      <g class="point" id="point-24" data-state="unvisited" transform="translate(390,100)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-25" data-state="unvisited" transform="translate(390,360)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-26" data-state="unvisited" transform="translate(80,150)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-27" data-state="unvisited" transform="translate(80,310)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-28" data-state="unvisited" transform="translate(700,150)"><circle class="point-circle" r="7"/></g>
+      <g class="point" id="point-29" data-state="unvisited" transform="translate(700,310)"><circle class="point-circle" r="7"/></g>
+    </svg>
+
+    <div class="controls">
+      <button class="btn-prev" id="btnPrev" onclick="prevStep()">← Prev</button>
+      <div class="progress" id="progress"></div>
+      <button class="btn-next" id="btnNext" onclick="nextStep()">Next →</button>
+    </div>
+    <div class="hint">← → arrow keys also work</div>
+  </div>
+
+  <!-- INFO PANEL -->
+  <div class="info-panel">
+    <div class="step-badge" id="stepBadge">Step 1 of 15</div>
+    <div class="step-title" id="stepTitle">Initialization</div>
+    <div class="step-desc" id="stepDesc"></div>
+
+    <div class="divider"></div>
+
+    <div class="params-grid">
+      <div class="param-card">
+        <div class="param-label">Epsilon (ε)</div>
+        <div class="param-value">45 px</div>
+      </div>
+      <div class="param-card">
+        <div class="param-label">MinPts</div>
+        <div class="param-value">4</div>
+      </div>
+      <div class="param-card">
+        <div class="param-label">Phase</div>
+        <div class="param-value" id="phaseVal" style="font-size:11px;padding-top:2px;">—</div>
+      </div>
+      <div class="param-card">
+        <div class="param-label">Examining</div>
+        <div class="param-value" id="examineVal">—</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px;font-weight:600;">Legend</div>
+    <div class="legend-grid">
+      <div class="legend-item"><div class="legend-dot ld-unvisited"></div>Unvisited</div>
+      <div class="legend-item"><div class="legend-dot ld-active"></div>Examining</div>
+      <div class="legend-item"><div class="legend-dot ld-frontier"></div>Frontier</div>
+      <div class="legend-item"><div class="legend-dot ld-core"></div>Core Point</div>
+      <div class="legend-item"><div class="legend-dot ld-border"></div>Border Point</div>
+      <div class="legend-item"><div class="legend-dot ld-noise"></div>Noise</div>
+      <div class="legend-item"><div class="legend-dot ld-c1"></div>Cluster 1</div>
+      <div class="legend-item"><div class="legend-dot ld-c2"></div>Cluster 2</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+// neighbors[i] = points within epsilon of i (not including i itself)
+// MinPts = 4 → need ≥ 3 neighbors to be a core point (3 others + self = 4 total)
+const N = {
+  0:[1,2,3,4,5],    // 5 neighbors → CORE
+  1:[0,2,5,6],      // 4 neighbors → CORE
+  2:[0,1,3,7],      // 4 neighbors → CORE
+  3:[0,2,4,8],      // 4 neighbors → CORE
+  4:[0,3,5,9],      // 4 neighbors → CORE
+  5:[0,1,4,10,11],  // 5 neighbors → CORE
+  6:[1],            // 1 neighbor  → BORDER (reachable from core p1)
+  7:[2],            // 1 neighbor  → BORDER (reachable from core p2)
+  8:[3],            // 1 neighbor  → BORDER (reachable from core p3)
+  9:[4],            // 1 neighbor  → BORDER (reachable from core p4)
+  10:[5],           // 1 neighbor  → BORDER (reachable from core p5)
+  11:[5],           // 1 neighbor  → BORDER (reachable from core p5)
+  12:[13,14,15,16,17],   // 5 neighbors → CORE
+  13:[12,14,17,18],      // 4 neighbors → CORE
+  14:[12,13,15,19],      // 4 neighbors → CORE
+  15:[12,14,16,20],      // 4 neighbors → CORE
+  16:[12,15,17,21],      // 4 neighbors → CORE
+  17:[12,13,16,22,23],   // 5 neighbors → CORE
+  18:[13], 19:[14], 20:[15], 21:[16], 22:[17], 23:[17],  // BORDER
+  24:[], 25:[], 26:[], 27:[], 28:[], 29:[]                // NOISE
+};
+
+const C1 = [0,1,2,3,4,5,6,7,8,9,10,11];
+const C2 = [12,13,14,15,16,17,18,19,20,21,22,23];
+const NOISE = [24,25,26,27,28,29];
+
+const C1_CONNS = [
+  'conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-0-11',
+  'conn-1-2','conn-1-5','conn-1-6',
+  'conn-2-3','conn-2-7',
+  'conn-3-4','conn-3-8',
+  'conn-4-5','conn-4-9',
+  'conn-5-10','conn-5-11'
+];
+const C2_CONNS = [
+  'conn-12-13','conn-12-14','conn-12-15','conn-12-16','conn-12-17','conn-12-23',
+  'conn-13-14','conn-13-17','conn-13-18',
+  'conn-14-15','conn-14-19',
+  'conn-15-16','conn-15-20',
+  'conn-16-17','conn-16-21',
+  'conn-17-22','conn-17-23'
+];
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function pt(i)  { return document.getElementById(`point-${i}`); }
+function eps(i) { return document.getElementById(`eps-${i}`); }
+function lbl(i) { return document.getElementById(`label-${i}`); }
+function conn(id) { return document.getElementById(id); }
+function dl(id) { return document.getElementById(id); }
+
+function setState(i, state) {
+  const el = pt(i);
+  el.dataset.state = state;
+  el.dataset.pulsing = 'false';
+  el.dataset.dim = 'false';
+  el.dataset.highlight = 'false';
+}
+
+function setActive(i) {
+  // Show the epsilon circle, pulsing outline, no fill change until classified
+  setState(i, 'active');
+  pt(i).dataset.pulsing = 'true';
+}
+
+function resetAll() {
+  for (let i = 0; i < 30; i++) {
+    setState(i, 'unvisited');
+  }
+  document.querySelectorAll('.epsilon-circle').forEach(e => e.classList.remove('visible'));
+  document.querySelectorAll('.connection-line').forEach(e => e.classList.remove('visible'));
+  document.querySelectorAll('.density-line').forEach(e => e.classList.remove('visible'));
+  document.querySelectorAll('.label-text').forEach(e => e.classList.remove('visible'));
+}
+
+function showEps(...ids) {
+  document.querySelectorAll('.epsilon-circle').forEach(e => e.classList.remove('visible'));
+  ids.forEach(i => eps(i) && eps(i).classList.add('visible'));
+}
+
+function showConns(ids) {
+  document.querySelectorAll('.connection-line').forEach(e => e.classList.remove('visible'));
+  ids.forEach(id => conn(id) && conn(id).classList.add('visible'));
+}
+
+function showDL(...ids) {
+  document.querySelectorAll('.density-line').forEach(e => e.classList.remove('visible'));
+  ids.forEach(id => dl(id) && dl(id).classList.add('visible'));
+}
+
+function showLabels(...ids) {
+  document.querySelectorAll('.label-text').forEach(e => e.classList.remove('visible'));
+  ids.forEach(i => lbl(i) && lbl(i).classList.add('visible'));
+}
+
+function dimAll() {
+  for (let i = 0; i < 30; i++) pt(i).dataset.dim = 'true';
+}
+function highlight(...ids) {
+  ids.forEach(i => {
+    pt(i).dataset.dim = 'false';
+    pt(i).dataset.highlight = 'true';
+  });
+}
+
+// Apply final cluster/noise state to a set
+function applyFinal(ids, stateMap) {
+  ids.forEach(i => setState(i, stateMap[i] || 'unvisited'));
+}
+
+// Classification map for final display
+const CLASS = {};
+for (let i = 0; i < 30; i++) {
+  if (C1.includes(i)) CLASS[i] = N[i].length >= 3 ? 'core' : 'border';
+  else if (C2.includes(i)) CLASS[i] = N[i].length >= 3 ? 'core' : 'border';
+  else CLASS[i] = 'noise';
+}
+
+function applyClassified(points) {
+  points.forEach(i => setState(i, CLASS[i]));
+}
+
+// ── STEPS ────────────────────────────────────────────────────────────────────
+const STEPS = [
+  // ── 0: Init
+  {
+    title: 'Dataset Overview',
+    desc: '30 points sit in 2D space: two dense clusters (left and right) plus 6 scattered noise points. DBSCAN will discover the clusters purely from local density — without being told how many clusters exist.',
+    phase: 'Setup', examine: '—',
+    run() {
+      resetAll();
+    }
+  },
+
+  // ── 1: Pick p0, draw ε
+  {
+    title: 'Pick a Starting Point',
+    desc: 'DBSCAN selects an unvisited point at random — here <strong>p0</strong> (center-left cluster). We draw its <span class="hl-cyan">epsilon (ε) circle</span>. Anything inside this radius is a "neighbor" of p0. We will count them to decide what kind of point p0 is.',
+    phase: 'Cluster 1', examine: 'p0',
+    run() {
+      resetAll();
+      setActive(0);
+      showEps(0);
+    }
+  },
+
+  // ── 2: p0 → CORE, add frontier
+  {
+    title: 'p0 is a Core Point',
+    desc: 'Inside p0\'s ε-circle we find <strong>5 neighbors</strong>: p1, p2, p3, p4, p5. With p0 itself that\'s 6 points — well above <strong>MinPts = 4</strong>. So p0 is a <span class="hl-core">Core Point</span>. Its neighbors that are still unvisited are added to the <span class="hl-green">frontier queue</span> (green) to be explored next.',
+    phase: 'Cluster 1', examine: 'p0 → Core',
+    run() {
+      resetAll();
+      setState(0, 'core');
+      showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5']);
+      // All unvisited neighbors go to frontier
+      [1,2,3,4,5].forEach(i => setState(i, 'frontier'));
+      showLabels(0);
+    }
+  },
+
+  // ── 3: Take p1 from frontier, show ε
+  {
+    title: 'Examine Next: p1',
+    desc: 'We dequeue <strong>p1</strong> from the frontier. It becomes the active point and we draw its ε-circle. Count the neighbors: p0, p2, p5, p6 — that is <strong>4 neighbors</strong>. With p1 itself = 5 points ≥ MinPts. p1 is also a <span class="hl-core">Core Point</span>.',
+    phase: 'Cluster 1', examine: 'p1',
+    run() {
+      setState(0, 'core');
+      showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5']);
+      // p1 goes active (dequeued from frontier)
+      setActive(1);
+      [2,3,4,5].forEach(i => setState(i, 'frontier'));
+      showEps(1);
+      showLabels(0);
+    }
+  },
+
+  // ── 4: p1 classified as core, p6 added to frontier
+  {
+    title: 'p1 is a Core Point',
+    desc: 'p1 is confirmed <span class="hl-core">Core</span>. Its new unvisited neighbor <strong>p6</strong> is added to the frontier (green). Note that p0 is already classified (red) and p2/p5 were already queued — they are not re-queued. The cluster keeps growing through density-reachable core points.',
+    phase: 'Cluster 1', examine: 'p1 → Core',
+    run() {
+      setState(0, 'core');
+      setState(1, 'core');
+      showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6']);
+      [2,3,4,5,6].forEach(i => setState(i, 'frontier'));
+      showLabels(0, 1);
+    }
+  },
+
+  // ── 5: Take p2, examine
+  {
+    title: 'Examine Next: p2',
+    desc: 'We dequeue <strong>p2</strong>. Its ε-circle contains <strong>4 neighbors</strong>: p0, p1, p3, p7. With itself = 5 ≥ MinPts. p2 is a <span class="hl-core">Core Point</span>. New unvisited neighbor <strong>p7</strong> gets added to the frontier.',
+    phase: 'Cluster 1', examine: 'p2',
+    run() {
+      setState(0, 'core');
+      setState(1, 'core');
+      setActive(2);
+      showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6','conn-2-3','conn-2-7']);
+      [3,4,5,6,7].forEach(i => setState(i, 'frontier'));
+      showEps(2);
+      showLabels(0, 1);
+    }
+  },
+
+  // ── 6: Take p6 from frontier, examine it
+  {
+    title: 'Examine Next: p6',
+    desc: 'We dequeue <strong>p6</strong>, sitting on the outer edge. Its ε-circle contains only <strong>1 neighbor</strong> (p1). With itself = 2 — less than MinPts = 4. p6 cannot be a core point. But since it IS within ε of core point p1, it is classified as a <span class="hl-border">Border Point</span> — it belongs to the cluster but cannot expand it.',
+    phase: 'Cluster 1', examine: 'p6 → Border',
+    run() {
+      setState(0, 'core'); setState(1, 'core'); setState(2, 'core');
+      setActive(6);
+      showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6','conn-2-3','conn-2-7']);
+      [3,4,5,7].forEach(i => setState(i, 'frontier'));
+      showEps(6);
+      showLabels(0, 1, 2);
+    }
+  },
+
+  // ── 7: p6 classified border, take p7
+  {
+    title: 'Examine Next: p7',
+    desc: 'p6 is labeled <span class="hl-border">Border</span>. Now we dequeue <strong>p7</strong>, the symmetric border point below. Same result: its ε-circle has only <strong>1 neighbor</strong> (p2). 2 points total < MinPts. It is also a <span class="hl-border">Border Point</span>. Border points define the outer shell of the cluster.',
+    phase: 'Cluster 1', examine: 'p7 → Border',
+    run() {
+      setState(0, 'core'); setState(1, 'core'); setState(2, 'core');
+      setState(6, 'border');
+      setActive(7);
+      showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6','conn-2-3','conn-2-7']);
+      [3,4,5].forEach(i => setState(i, 'frontier'));
+      showEps(7);
+      showLabels(0, 1, 2, 6);
+    }
+  },
+
+  // ── 8: Complete Cluster 1 (show all classified)
+  {
+    title: 'Cluster 1 — Fully Classified',
+    desc: 'Processing continues for p3, p4, p5 (all <span class="hl-core">Core</span> with ≥ 3 neighbors each) and their border neighbors p8, p9, p10, p11. All 12 points are now classified: <strong>6 core points</strong> form the dense backbone, <strong>6 border points</strong> define the outer edge.',
+    phase: 'Cluster 1', examine: 'Complete',
+    run() {
+      C1.forEach(i => setState(i, CLASS[i]));
+      showConns(C1_CONNS);
+      showLabels(...C1);
+    }
+  },
+
+  // ── 9: Paint Cluster 1 amber
+  {
+    title: 'Cluster 1 Complete',
+    desc: 'All 12 points of <span class="hl-c1">Cluster 1</span> are painted amber — core and border alike. DBSCAN moves on to find the next unvisited point. The noise points and Cluster 2 are still unvisited (dark).',
+    phase: 'Cluster 1 ✓', examine: 'Done',
+    run() {
+      C1.forEach(i => setState(i, 'c1'));
+      showConns(C1_CONNS);
+      showLabels(...C1);
+    }
+  },
+
+  // ── 10: Noise points discovered
+  {
+    title: 'Noise Points Discovered',
+    desc: 'DBSCAN picks each of the 6 isolated points in turn. Each one\'s ε-circle is completely empty — <strong>0 neighbors</strong>. With only 1 point (itself) inside ε, that is far below MinPts = 4. These points are not within ε of any core point either, so they are labeled <span class="hl-noise">Noise</span>.',
+    phase: 'Noise scan', examine: 'p24–p29',
+    run() {
+      C1.forEach(i => setState(i, 'c1'));
+      NOISE.forEach(i => setState(i, 'noise'));
+      showConns(C1_CONNS);
+      showEps(24, 25, 26, 27, 28, 29);
+      showLabels(...C1, ...NOISE);
+    }
+  },
+
+  // ── 11: Cluster 2 complete
+  {
+    title: 'Cluster 2 Discovered',
+    desc: 'DBSCAN finds an unvisited point in the right group and expands it the same way: 6 <span class="hl-core">core points</span> with ≥ 3 neighbors each, 6 <span class="hl-border">border points</span> with only 1 neighbor. All 12 form <span class="hl-c2">Cluster 2</span>. DBSCAN found both clusters without ever being told the cluster count!',
+    phase: 'Cluster 2 ✓', examine: 'Done',
+    run() {
+      C1.forEach(i => setState(i, 'c1'));
+      C2.forEach(i => setState(i, 'c2'));
+      NOISE.forEach(i => setState(i, 'noise'));
+      showConns([...C1_CONNS, ...C2_CONNS]);
+      showLabels(...C1, ...C2, ...NOISE);
+    }
+  },
+
+  // ── 12: Concept — directly density-reachable
+  {
+    title: 'Concept: Directly Density-Reachable',
+    desc: '<strong>Directly density-reachable:</strong> point q is directly density-reachable from core point p if q falls inside p\'s ε-circle. Here, border point <strong>p6</strong> is directly density-reachable from core point <strong>p1</strong> because p6 lies within p1\'s ε-radius. The <span class="hl-cyan">cyan line</span> shows this direct connection.',
+    phase: 'Concepts', examine: 'p1 → p6',
+    run() {
+      C1.forEach(i => setState(i, CLASS[i]));
+      C2.forEach(i => setState(i, CLASS[i]));
+      NOISE.forEach(i => setState(i, 'noise'));
+      showConns([...C1_CONNS, ...C2_CONNS]);
+      dimAll();
+      highlight(1, 6);
+      showDL('dl-1-6');
+      showLabels(1, 6);
+    }
+  },
+
+  // ── 13: Concept — density-reachable (chain)
+  {
+    title: 'Concept: Density-Reachable',
+    desc: '<strong>Density-reachable:</strong> q is density-reachable from p if there is a chain of core points p→c₁→c₂→…→q where each step is a direct density-reachable hop. Here: <strong>p0 → p1 → p2</strong> — each is a core point within ε of the next. So p2 is density-reachable from p0 through the chain.',
+    phase: 'Concepts', examine: 'p0→p1→p2',
+    run() {
+      C1.forEach(i => setState(i, CLASS[i]));
+      C2.forEach(i => setState(i, CLASS[i]));
+      NOISE.forEach(i => setState(i, 'noise'));
+      showConns([...C1_CONNS, ...C2_CONNS]);
+      dimAll();
+      highlight(0, 1, 2);
+      showDL('dl-0-1', 'dl-1-2');
+      showLabels(0, 1, 2);
+    }
+  },
+
+  // ── 14: Concept — density-connected
+  {
+    title: 'Concept: Density-Connected',
+    desc: '<strong>Density-connected:</strong> two points are density-connected if there exists a core point from which both are density-reachable. Central core <strong>p0</strong> reaches border point <strong>p6</strong> via the chain p0→p1→p6, and reaches border point <strong>p7</strong> via the chain p0→p2→p7. Both chains radiate from p0 in opposite directions — so p6 and p7 are density-connected through p0, which is why they belong to the same cluster.',
+    phase: 'Concepts', examine: 'p6 ↔ p7',
+    run() {
+      C1.forEach(i => setState(i, CLASS[i]));
+      C2.forEach(i => setState(i, CLASS[i]));
+      NOISE.forEach(i => setState(i, 'noise'));
+      showConns([...C1_CONNS, ...C2_CONNS]);
+      dimAll();
+      highlight(0, 1, 2, 6, 7);
+      showDL('dl-0-1b', 'dl-1-6b', 'dl-0-2', 'dl-2-7');
+      showLabels(0, 6, 7);
+    }
+  },
+
+  // ── 15: Final — not density-connected across clusters
+  {
+    title: 'Not Density-Connected Across Clusters',
+    desc: 'Points from different clusters are <strong>never density-connected</strong> — there is no chain of core points that bridges the gap between the two groups. The inter-cluster distance exceeds ε, so no core from Cluster 1 is a neighbor of any core from Cluster 2. DBSCAN separates them correctly with zero prior knowledge.',
+    phase: 'Final', examine: 'Summary',
+    run() {
+      C1.forEach(i => setState(i, 'c1'));
+      C2.forEach(i => setState(i, 'c2'));
+      NOISE.forEach(i => setState(i, 'noise'));
+      showConns([...C1_CONNS, ...C2_CONNS]);
+      showLabels(...C1, ...C2, ...NOISE);
+    }
+  }
+];
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+let cur = 0;
+
+function buildProgress() {
+  const el = document.getElementById('progress');
+  el.innerHTML = '';
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'progress-dot' + (i < cur ? ' done' : i === cur ? ' active' : '');
+    el.appendChild(d);
+  });
+}
+
+function render() {
+  const s = STEPS[cur];
+  document.getElementById('stepBadge').textContent = `Step ${cur + 1} of ${STEPS.length}`;
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepDesc').innerHTML = s.desc;
+  document.getElementById('phaseVal').textContent = s.phase;
+  document.getElementById('examineVal').textContent = s.examine;
+  document.getElementById('btnPrev').disabled = cur === 0;
+  document.getElementById('btnNext').disabled = cur === STEPS.length - 1;
+  buildProgress();
+  s.run();
+}
+
+function nextStep() { if (cur < STEPS.length - 1) { cur++; render(); } }
+function prevStep() { if (cur > 0) { cur--; render(); } }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') nextStep();
+  if (e.key === 'ArrowLeft')  prevStep();
+});
+
+render();
+</script>
+</body>
+</html>
