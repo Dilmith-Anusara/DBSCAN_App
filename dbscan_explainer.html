@@ -35,28 +35,94 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 16px 40px;
+  padding: 20px 16px 40px;
 }
 
 header {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 1240px;
 }
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
 h1 {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--cyan);
   letter-spacing: 0.04em;
-  margin-bottom: 4px;
-}
-.subtitle {
-  color: var(--muted);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
+.subtitle {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ── LIVE STATS BAR ── */
+.stats-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px;
+}
+.stat-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.stat-label { color: var(--muted); }
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  min-width: 18px;
+  text-align: right;
+  transition: color 0.3s;
+}
+
+/* ── SECTION NAV ── */
+.section-nav {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.sec-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--muted);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+}
+.sec-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.sec-btn.active { background: rgba(0,212,255,0.12); border-color: var(--cyan); color: var(--cyan); }
+
+/* ── MAIN LAYOUT ── */
 .main-container {
   display: flex;
   gap: 20px;
@@ -76,29 +142,36 @@ h1 {
   flex-shrink: 0;
 }
 
-svg {
-  display: block;
-  border-radius: 10px;
-  background: var(--bg);
-}
+svg { display: block; border-radius: 10px; background: var(--bg); }
 
 /* SVG elements */
 .point-circle {
   fill: var(--surface2);
   stroke: var(--border2);
   stroke-width: 2;
-  transition: fill 0.35s ease, stroke 0.35s ease, r 0.35s ease, filter 0.35s ease, opacity 0.35s ease;
+  transition: fill 0.35s ease, stroke 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
 }
+
+/* Animated epsilon ring */
 .epsilon-circle {
   fill: none;
   stroke: var(--cyan);
   stroke-width: 1.8;
   stroke-dasharray: 7 5;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.4s ease, r 0.5s ease;
   pointer-events: none;
 }
 .epsilon-circle.visible { opacity: 0.5; }
+
+/* Animated epsilon — scales in */
+@keyframes epsIn {
+  from { r: 10; opacity: 0; }
+  to   { r: 45; opacity: 0.5; }
+}
+.epsilon-circle.animate-in {
+  animation: epsIn 0.45s cubic-bezier(0.22,1,0.36,1) forwards;
+}
 
 .connection-line {
   stroke: var(--muted);
@@ -108,13 +181,26 @@ svg {
 }
 .connection-line.visible { opacity: 0.22; }
 
+/* Density lines with draw animation */
 .density-line {
   stroke-width: 2.5;
   stroke-linecap: round;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  transition: opacity 0.2s ease;
 }
-.density-line.visible { opacity: 1; }
+.density-line.visible {
+  opacity: 1;
+  animation: drawLine 0.5s ease forwards;
+}
+.density-line.visible.delay1 { animation-delay: 0.3s; }
+.density-line.visible.delay2 { animation-delay: 0.6s; }
+.density-line.visible.delay3 { animation-delay: 0.9s; }
+
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
 
 .label-text {
   font-family: 'JetBrains Mono', monospace;
@@ -127,7 +213,7 @@ svg {
 }
 .label-text.visible { opacity: 1; }
 
-/* Point state colors via data-state */
+/* Point states */
 .point[data-state="unvisited"] .point-circle { fill: var(--surface2); stroke: var(--border2); }
 .point[data-state="active"]    .point-circle { fill: var(--surface2); stroke: var(--cyan); stroke-width: 2.5; }
 .point[data-state="frontier"]  .point-circle { fill: var(--green); stroke: var(--green); }
@@ -137,30 +223,26 @@ svg {
 .point[data-state="c2"]        .point-circle { fill: var(--teal); stroke: var(--teal); }
 .point[data-state="noise"]     .point-circle { fill: var(--gray); stroke: var(--gray); }
 
-.point[data-dim="true"] .point-circle { opacity: 0.18; }
-.point[data-highlight="true"] .point-circle { filter: drop-shadow(0 0 5px currentColor); opacity: 1; }
+.point[data-dim="true"] .point-circle { opacity: 0.15; }
+.point[data-highlight="true"] .point-circle { filter: drop-shadow(0 0 6px currentColor); opacity: 1; }
 
-/* Pulsing active ring */
-@keyframes pulseRing {
-  0%, 100% { r: 7; }
-  50% { r: 10; }
-}
-.point[data-pulsing="true"] .point-circle {
-  animation: pulseRing 1.2s infinite ease-in-out;
-}
+@keyframes pulseRing { 0%,100% { r:7; } 50% { r:10; } }
+.point[data-pulsing="true"] .point-circle { animation: pulseRing 1.2s infinite ease-in-out; }
 
 /* ── CONTROLS ── */
 .controls {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   margin-top: 14px;
   justify-content: center;
+  flex-wrap: wrap;
 }
+
 button {
   font-family: 'JetBrains Mono', monospace;
-  padding: 9px 22px;
-  font-size: 13px;
+  padding: 8px 18px;
+  font-size: 12px;
   font-weight: 600;
   border: none;
   border-radius: 8px;
@@ -169,32 +251,57 @@ button {
   letter-spacing: 0.02em;
 }
 button:active:not(:disabled) { transform: scale(0.97); }
-.btn-prev {
+
+.btn-prev, .btn-next {
   background: var(--surface2);
   color: var(--text);
   border: 1px solid var(--border2);
 }
-.btn-prev:hover:not(:disabled) { background: var(--border2); }
-.btn-next {
-  background: #1e6f35;
-  color: #fff;
-  border: 1px solid #2a8e44;
+.btn-prev:hover:not(:disabled),
+.btn-next:hover:not(:disabled) { background: var(--border2); }
+
+.btn-play {
+  background: rgba(0,212,255,0.15);
+  color: var(--cyan);
+  border: 1px solid rgba(0,212,255,0.35);
+  min-width: 80px;
 }
-.btn-next:hover:not(:disabled) { background: #258540; }
+.btn-play:hover { background: rgba(0,212,255,0.25); }
+.btn-play.playing { background: rgba(240,64,64,0.15); color: var(--red); border-color: rgba(240,64,64,0.35); }
+
 button:disabled { opacity: 0.3; cursor: not-allowed; }
 
-.progress {
+/* Speed selector */
+.speed-wrap {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
 }
+.speed-select {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--cyan);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  outline: none;
+}
+
+.progress { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 300px; }
 .progress-dot {
-  width: 6px; height: 6px;
+  width: 5px; height: 5px;
   border-radius: 50%;
   background: var(--border2);
   transition: background 0.3s, transform 0.3s;
 }
-.progress-dot.active { background: var(--cyan); transform: scale(1.4); }
-.progress-dot.done { background: var(--green); }
+.progress-dot.active { background: var(--cyan); transform: scale(1.5); }
+.progress-dot.done   { background: var(--green); }
+
+.hint { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; opacity: 0.5; }
 
 /* ── INFO PANEL ── */
 .info-panel {
@@ -223,12 +330,13 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   color: var(--white);
   margin-bottom: 12px;
   line-height: 1.3;
+  min-height: 44px;
 }
 .step-desc {
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 13px;
   line-height: 1.75;
-  flex: 1;
+  min-height: 120px;
 }
 .step-desc strong { color: var(--white); font-weight: 600; }
 .step-desc .hl-core   { color: var(--red);   font-weight: 600; }
@@ -239,17 +347,12 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
 .step-desc .hl-cyan   { color: var(--cyan);  font-weight: 600; }
 .step-desc .hl-green  { color: var(--green); font-weight: 600; }
 
-.divider {
-  height: 1px;
-  background: var(--border);
-  margin: 18px 0;
-}
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
 
 .params-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-bottom: 0;
 }
 .param-card {
   background: var(--surface2);
@@ -257,63 +360,105 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   border-radius: 8px;
   padding: 10px 12px;
 }
-.param-label {
-  font-size: 10px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 3px;
+.param-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
+.param-value { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--cyan); }
+
+/* Neighbor card */
+.neighbor-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
 }
-.param-value {
+.neighbor-card.visible { display: flex; }
+.neighbor-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+.neighbor-count { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 700; transition: color 0.3s; }
+.neighbor-verdict {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 700;
-  color: var(--cyan);
+  padding: 4px 10px;
+  border-radius: 6px;
 }
+.verdict-core   { background: rgba(63,185,80,0.15);  color: var(--green); }
+.verdict-border { background: rgba(77,157,224,0.15); color: var(--blue); }
+.verdict-noise  { background: rgba(90,100,116,0.15); color: var(--gray); }
 
 /* Legend */
-.legend-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px 12px;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--muted);
-}
-.legend-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  border: 2px solid transparent;
-}
+.legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 2px solid transparent; }
 .ld-unvisited { background: var(--surface2); border-color: var(--border2); }
 .ld-active    { background: var(--surface2); border-color: var(--cyan); }
-.ld-frontier  { background: var(--green); border-color: var(--green); }
-.ld-core      { background: var(--red);   border-color: var(--red);   }
-.ld-border    { background: var(--blue);  border-color: var(--blue);  }
-.ld-c1        { background: var(--amber); border-color: var(--amber); }
-.ld-c2        { background: var(--teal);  border-color: var(--teal);  }
-.ld-noise     { background: var(--gray);  border-color: var(--gray);  }
-.ld-epsilon   { background: transparent; border-color: var(--cyan); border-style: dashed; }
+.ld-frontier  { background: var(--green); }
+.ld-core      { background: var(--red); }
+.ld-border    { background: var(--blue); }
+.ld-c1        { background: var(--amber); }
+.ld-c2        { background: var(--teal); }
+.ld-noise     { background: var(--gray); }
 
-.hint {
-  font-size: 11px;
-  color: var(--muted);
-  text-align: center;
-  margin-top: 10px;
-  opacity: 0.6;
+/* FF notice */
+.ff-notice {
+  background: rgba(245,166,35,0.08);
+  border: 1px solid rgba(245,166,35,0.25);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--amber);
+  display: none;
+  margin-top: 8px;
 }
+.ff-notice.visible { display: block; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>▸ DBSCAN Step-by-Step</h1>
-  <div class="subtitle">Density-Based Spatial Clustering of Applications with Noise</div>
+  <div class="header-top">
+    <div style="text-align:left">
+      <h1>▸ DBSCAN Step-by-Step</h1>
+      <div class="subtitle">Density-Based Spatial Clustering of Applications with Noise</div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-chip">
+        <div class="stat-dot" style="background:var(--red)"></div>
+        <span class="stat-label">Core</span>
+        <span class="stat-value" id="statCore" style="color:var(--red)">0</span>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-dot" style="background:var(--blue)"></div>
+        <span class="stat-label">Border</span>
+        <span class="stat-value" id="statBorder" style="color:var(--blue)">0</span>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-dot" style="background:var(--gray)"></div>
+        <span class="stat-label">Noise</span>
+        <span class="stat-value" id="statNoise" style="color:var(--gray)">0</span>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-dot" style="background:var(--muted)"></div>
+        <span class="stat-label">Unvisited</span>
+        <span class="stat-value" id="statUnvisited" style="color:var(--muted)">30</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section jump nav -->
+  <div class="section-nav">
+    <button class="sec-btn" onclick="jumpTo(0)">① Init</button>
+    <button class="sec-btn" onclick="jumpTo(1)">② Pick p0</button>
+    <button class="sec-btn" onclick="jumpTo(2)">③ Core Point</button>
+    <button class="sec-btn" onclick="jumpTo(3)">④ Frontier</button>
+    <button class="sec-btn" onclick="jumpTo(6)">⑤ Border Point</button>
+    <button class="sec-btn" onclick="jumpTo(8)">⑥ Cluster 1 Done</button>
+    <button class="sec-btn" onclick="jumpTo(10)">⑦ Cluster 2</button>
+    <button class="sec-btn" onclick="jumpTo(11)">⑧ Noise</button>
+    <button class="sec-btn" onclick="jumpTo(12)">⑨ Concepts</button>
+  </div>
 </header>
 
 <div class="main-container">
@@ -361,16 +506,13 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
       <line class="connection-line" id="conn-17-23" x1="530" y1="210" x2="560" y2="180"/>
 
       <!-- Density-reachability highlight lines -->
-      <!-- Step 12 (directly density-reachable): p1 → p6 -->
-      <line class="density-line" id="dl-1-6"   x1="250" y1="210" x2="290" y2="190" stroke="#00d4ff"/>
-      <!-- Step 13 (density-reachable): p0 → p1 → p2 -->
-      <line class="density-line" id="dl-0-1"   x1="220" y1="230" x2="250" y2="210" stroke="#f5a623"/>
-      <line class="density-line" id="dl-1-2"   x1="250" y1="210" x2="250" y2="250" stroke="#f5a623"/>
-      <!-- Step 14 (density-connected via p0): p6←p1←p0→p2→p7 -->
-      <line class="density-line" id="dl-0-1b"  x1="220" y1="230" x2="250" y2="210" stroke="#3fb950"/>
-      <line class="density-line" id="dl-1-6b"  x1="250" y1="210" x2="290" y2="190" stroke="#3fb950"/>
-      <line class="density-line" id="dl-0-2"   x1="220" y1="230" x2="250" y2="250" stroke="#3fb950"/>
-      <line class="density-line" id="dl-2-7"   x1="250" y1="250" x2="290" y2="270" stroke="#3fb950"/>
+      <line class="density-line" id="dl-1-6"  x1="250" y1="210" x2="290" y2="190" stroke="#00d4ff"/>
+      <line class="density-line" id="dl-0-1"  x1="220" y1="230" x2="250" y2="210" stroke="#f5a623"/>
+      <line class="density-line" id="dl-1-2"  x1="250" y1="210" x2="250" y2="250" stroke="#f5a623"/>
+      <line class="density-line" id="dl-0-1b" x1="220" y1="230" x2="250" y2="210" stroke="#3fb950"/>
+      <line class="density-line" id="dl-1-6b" x1="250" y1="210" x2="290" y2="190" stroke="#3fb950"/>
+      <line class="density-line" id="dl-0-2"  x1="220" y1="230" x2="250" y2="250" stroke="#3fb950"/>
+      <line class="density-line" id="dl-2-7"  x1="250" y1="250" x2="290" y2="270" stroke="#3fb950"/>
 
       <!-- Epsilon circles -->
       <circle class="epsilon-circle" id="eps-0"  cx="220" cy="230" r="45"/>
@@ -404,7 +546,7 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
       <circle class="epsilon-circle" id="eps-28" cx="700" cy="150" r="45"/>
       <circle class="epsilon-circle" id="eps-29" cx="700" cy="310" r="45"/>
 
-      <!-- Point labels -->
+      <!-- Labels -->
       <text class="label-text" id="label-0"  x="220" y="219" text-anchor="middle">Core</text>
       <text class="label-text" id="label-1"  x="250" y="199" text-anchor="middle">Core</text>
       <text class="label-text" id="label-2"  x="250" y="239" text-anchor="middle">Core</text>
@@ -436,36 +578,31 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
       <text class="label-text" id="label-28" x="700" y="139" text-anchor="middle">Noise</text>
       <text class="label-text" id="label-29" x="700" y="299" text-anchor="middle">Noise</text>
 
-      <!-- Points (30 total) -->
-      <!-- Cluster 1 core ring -->
+      <!-- Points -->
       <g class="point" id="point-0"  data-state="unvisited" transform="translate(220,230)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-1"  data-state="unvisited" transform="translate(250,210)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-2"  data-state="unvisited" transform="translate(250,250)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-3"  data-state="unvisited" transform="translate(220,270)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-4"  data-state="unvisited" transform="translate(190,250)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-5"  data-state="unvisited" transform="translate(190,210)"><circle class="point-circle" r="7"/></g>
-      <!-- Cluster 1 border ring -->
       <g class="point" id="point-6"  data-state="unvisited" transform="translate(290,190)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-7"  data-state="unvisited" transform="translate(290,270)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-8"  data-state="unvisited" transform="translate(220,310)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-9"  data-state="unvisited" transform="translate(150,270)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-10" data-state="unvisited" transform="translate(150,190)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-11" data-state="unvisited" transform="translate(220,180)"><circle class="point-circle" r="7"/></g>
-      <!-- Cluster 2 core ring -->
       <g class="point" id="point-12" data-state="unvisited" transform="translate(560,230)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-13" data-state="unvisited" transform="translate(590,210)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-14" data-state="unvisited" transform="translate(590,250)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-15" data-state="unvisited" transform="translate(560,270)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-16" data-state="unvisited" transform="translate(530,250)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-17" data-state="unvisited" transform="translate(530,210)"><circle class="point-circle" r="7"/></g>
-      <!-- Cluster 2 border ring -->
       <g class="point" id="point-18" data-state="unvisited" transform="translate(630,190)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-19" data-state="unvisited" transform="translate(630,270)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-20" data-state="unvisited" transform="translate(560,310)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-21" data-state="unvisited" transform="translate(490,270)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-22" data-state="unvisited" transform="translate(490,190)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-23" data-state="unvisited" transform="translate(560,180)"><circle class="point-circle" r="7"/></g>
-      <!-- Isolated noise -->
       <g class="point" id="point-24" data-state="unvisited" transform="translate(390,100)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-25" data-state="unvisited" transform="translate(390,360)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-26" data-state="unvisited" transform="translate(80,150)"><circle class="point-circle" r="7"/></g>
@@ -476,17 +613,45 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
 
     <div class="controls">
       <button class="btn-prev" id="btnPrev" onclick="prevStep()">← Prev</button>
+      <button class="btn-play" id="btnPlay" onclick="togglePlay()">▶ Play</button>
       <div class="progress" id="progress"></div>
       <button class="btn-next" id="btnNext" onclick="nextStep()">Next →</button>
     </div>
-    <div class="hint">← → arrow keys also work</div>
+
+    <div class="controls" style="margin-top:8px">
+      <div class="speed-wrap">
+        <span>Speed:</span>
+        <select class="speed-select" id="speedSel" onchange="updateSpeed()">
+          <option value="2500">0.5×</option>
+          <option value="1800" selected>1×</option>
+          <option value="1000">2×</option>
+          <option value="500">4×</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="hint">← → arrow keys &nbsp;|&nbsp; Space to play/pause</div>
   </div>
 
   <!-- INFO PANEL -->
   <div class="info-panel">
-    <div class="step-badge" id="stepBadge">Step 1 of 15</div>
+    <div class="step-badge" id="stepBadge">Step 1 of 16</div>
     <div class="step-title" id="stepTitle">Initialization</div>
     <div class="step-desc" id="stepDesc"></div>
+
+    <div class="divider"></div>
+
+    <div class="neighbor-card" id="nbrCard">
+      <div>
+        <div class="neighbor-label">Neighbors (incl. self)</div>
+        <div class="neighbor-count" id="nbrCount">—</div>
+      </div>
+      <div style="text-align:right">
+        <div class="neighbor-label">vs MinPts = 4</div>
+        <div class="neighbor-verdict" id="nbrVerdict"></div>
+      </div>
+    </div>
+    <div class="ff-notice" id="ffNotice">⚡ Fast-forward: p3–p5 follow the same logic — each has ≥ 3 neighbors and is confirmed Core.</div>
 
     <div class="divider"></div>
 
@@ -526,30 +691,13 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
 </div>
 
 <script>
-// ── DATA ─────────────────────────────────────────────────────────────────────
-// neighbors[i] = points within epsilon of i (not including i itself)
-// MinPts = 4 → need ≥ 3 neighbors to be a core point (3 others + self = 4 total)
 const N = {
-  0:[1,2,3,4,5],    // 5 neighbors → CORE
-  1:[0,2,5,6],      // 4 neighbors → CORE
-  2:[0,1,3,7],      // 4 neighbors → CORE
-  3:[0,2,4,8],      // 4 neighbors → CORE
-  4:[0,3,5,9],      // 4 neighbors → CORE
-  5:[0,1,4,10,11],  // 5 neighbors → CORE
-  6:[1],            // 1 neighbor  → BORDER (reachable from core p1)
-  7:[2],            // 1 neighbor  → BORDER (reachable from core p2)
-  8:[3],            // 1 neighbor  → BORDER (reachable from core p3)
-  9:[4],            // 1 neighbor  → BORDER (reachable from core p4)
-  10:[5],           // 1 neighbor  → BORDER (reachable from core p5)
-  11:[5],           // 1 neighbor  → BORDER (reachable from core p5)
-  12:[13,14,15,16,17],   // 5 neighbors → CORE
-  13:[12,14,17,18],      // 4 neighbors → CORE
-  14:[12,13,15,19],      // 4 neighbors → CORE
-  15:[12,14,16,20],      // 4 neighbors → CORE
-  16:[12,15,17,21],      // 4 neighbors → CORE
-  17:[12,13,16,22,23],   // 5 neighbors → CORE
-  18:[13], 19:[14], 20:[15], 21:[16], 22:[17], 23:[17],  // BORDER
-  24:[], 25:[], 26:[], 27:[], 28:[], 29:[]                // NOISE
+  0:[1,2,3,4,5], 1:[0,2,5,6], 2:[0,1,3,7], 3:[0,2,4,8], 4:[0,3,5,9], 5:[0,1,4,10,11],
+  6:[1], 7:[2], 8:[3], 9:[4], 10:[5], 11:[5],
+  12:[13,14,15,16,17], 13:[12,14,17,18], 14:[12,13,15,19], 15:[12,14,16,20],
+  16:[12,15,17,21], 17:[12,13,16,22,23],
+  18:[13], 19:[14], 20:[15], 21:[16], 22:[17], 23:[17],
+  24:[], 25:[], 26:[], 27:[], 28:[], 29:[]
 };
 
 const C1 = [0,1,2,3,4,5,6,7,8,9,10,11];
@@ -558,22 +706,23 @@ const NOISE = [24,25,26,27,28,29];
 
 const C1_CONNS = [
   'conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-0-11',
-  'conn-1-2','conn-1-5','conn-1-6',
-  'conn-2-3','conn-2-7',
-  'conn-3-4','conn-3-8',
-  'conn-4-5','conn-4-9',
-  'conn-5-10','conn-5-11'
+  'conn-1-2','conn-1-5','conn-1-6','conn-2-3','conn-2-7',
+  'conn-3-4','conn-3-8','conn-4-5','conn-4-9','conn-5-10','conn-5-11'
 ];
 const C2_CONNS = [
   'conn-12-13','conn-12-14','conn-12-15','conn-12-16','conn-12-17','conn-12-23',
-  'conn-13-14','conn-13-17','conn-13-18',
-  'conn-14-15','conn-14-19',
-  'conn-15-16','conn-15-20',
-  'conn-16-17','conn-16-21',
-  'conn-17-22','conn-17-23'
+  'conn-13-14','conn-13-17','conn-13-18','conn-14-15','conn-14-19',
+  'conn-15-16','conn-15-20','conn-16-17','conn-16-21','conn-17-22','conn-17-23'
 ];
 
-// ── HELPERS ──────────────────────────────────────────────────────────────────
+const CLASS = {};
+for (let i = 0; i < 30; i++) {
+  if (C1.includes(i)) CLASS[i] = N[i].length >= 3 ? 'core' : 'border';
+  else if (C2.includes(i)) CLASS[i] = N[i].length >= 3 ? 'core' : 'border';
+  else CLASS[i] = 'noise';
+}
+
+// Helpers
 function pt(i)  { return document.getElementById(`point-${i}`); }
 function eps(i) { return document.getElementById(`eps-${i}`); }
 function lbl(i) { return document.getElementById(`label-${i}`); }
@@ -589,23 +738,41 @@ function setState(i, state) {
 }
 
 function setActive(i) {
-  // Show the epsilon circle, pulsing outline, no fill change until classified
   setState(i, 'active');
   pt(i).dataset.pulsing = 'true';
 }
 
 function resetAll() {
-  for (let i = 0; i < 30; i++) {
-    setState(i, 'unvisited');
-  }
-  document.querySelectorAll('.epsilon-circle').forEach(e => e.classList.remove('visible'));
+  for (let i = 0; i < 30; i++) setState(i, 'unvisited');
+  document.querySelectorAll('.epsilon-circle').forEach(e => {
+    e.classList.remove('visible', 'animate-in');
+  });
   document.querySelectorAll('.connection-line').forEach(e => e.classList.remove('visible'));
-  document.querySelectorAll('.density-line').forEach(e => e.classList.remove('visible'));
+  document.querySelectorAll('.density-line').forEach(e => {
+    e.classList.remove('visible', 'delay1', 'delay2', 'delay3');
+  });
   document.querySelectorAll('.label-text').forEach(e => e.classList.remove('visible'));
+  hideNeighborBadge();
+  showFF(false);
+  updateStats();
+}
+
+function showEpsAnimated(...ids) {
+  document.querySelectorAll('.epsilon-circle').forEach(e => {
+    e.classList.remove('visible', 'animate-in');
+  });
+  ids.forEach(i => {
+    const el = eps(i);
+    if (!el) return;
+    // Trigger reflow to restart animation
+    void el.offsetWidth;
+    el.classList.add('animate-in');
+    setTimeout(() => { el.classList.remove('animate-in'); el.classList.add('visible'); }, 460);
+  });
 }
 
 function showEps(...ids) {
-  document.querySelectorAll('.epsilon-circle').forEach(e => e.classList.remove('visible'));
+  document.querySelectorAll('.epsilon-circle').forEach(e => e.classList.remove('visible', 'animate-in'));
   ids.forEach(i => eps(i) && eps(i).classList.add('visible'));
 }
 
@@ -614,9 +781,23 @@ function showConns(ids) {
   ids.forEach(id => conn(id) && conn(id).classList.add('visible'));
 }
 
-function showDL(...ids) {
-  document.querySelectorAll('.density-line').forEach(e => e.classList.remove('visible'));
-  ids.forEach(id => dl(id) && dl(id).classList.add('visible'));
+function showDLAnimated(...specs) {
+  // specs: [{id, delay}]
+  document.querySelectorAll('.density-line').forEach(e => {
+    e.classList.remove('visible', 'delay1', 'delay2', 'delay3');
+  });
+  specs.forEach(({id, delay}) => {
+    const el = dl(id);
+    if (!el) return;
+    void el.offsetWidth;
+    const cls = delay === 1 ? 'delay1' : delay === 2 ? 'delay2' : delay === 3 ? 'delay3' : '';
+    el.classList.add('visible');
+    if (cls) el.classList.add(cls);
+  });
+}
+
+function showDL() {
+  document.querySelectorAll('.density-line').forEach(e => e.classList.remove('visible','delay1','delay2','delay3'));
 }
 
 function showLabels(...ids) {
@@ -634,127 +815,160 @@ function highlight(...ids) {
   });
 }
 
-// Apply final cluster/noise state to a set
-function applyFinal(ids, stateMap) {
-  ids.forEach(i => setState(i, stateMap[i] || 'unvisited'));
+function showNeighborBadge(pointIdx) {
+  const neighborCount = N[pointIdx].length;
+  const total = neighborCount + 1;
+  const isCore = neighborCount >= 3;
+  const isBorder = !isCore && N[pointIdx].some(j => N[j].length >= 3);
+  const card = document.getElementById('nbrCard');
+  const count = document.getElementById('nbrCount');
+  const verdict = document.getElementById('nbrVerdict');
+  card.classList.add('visible');
+  count.textContent = total;
+  count.style.color = isCore ? 'var(--green)' : (isBorder ? 'var(--blue)' : 'var(--gray)');
+  if (isCore) {
+    verdict.textContent = '✓ Core';
+    verdict.className = 'neighbor-verdict verdict-core';
+  } else if (isBorder) {
+    verdict.textContent = '~ Border';
+    verdict.className = 'neighbor-verdict verdict-border';
+  } else {
+    verdict.textContent = '✗ Noise';
+    verdict.className = 'neighbor-verdict verdict-noise';
+  }
 }
 
-// Classification map for final display
-const CLASS = {};
-for (let i = 0; i < 30; i++) {
-  if (C1.includes(i)) CLASS[i] = N[i].length >= 3 ? 'core' : 'border';
-  else if (C2.includes(i)) CLASS[i] = N[i].length >= 3 ? 'core' : 'border';
-  else CLASS[i] = 'noise';
+function hideNeighborBadge() {
+  document.getElementById('nbrCard').classList.remove('visible');
+}
+function showFF(v) {
+  const el = document.getElementById('ffNotice');
+  v ? el.classList.add('visible') : el.classList.remove('visible');
 }
 
-function applyClassified(points) {
-  points.forEach(i => setState(i, CLASS[i]));
+// Live stats counter
+function updateStats() {
+  let core = 0, border = 0, noise = 0, unvisited = 0;
+  for (let i = 0; i < 30; i++) {
+    const s = pt(i).dataset.state;
+    if (s === 'core' || s === 'c1' || s === 'c2') core++;
+    else if (s === 'border') border++;
+    else if (s === 'noise') noise++;
+    else unvisited++;
+  }
+  // Count frontier separately — it will become core/border
+  document.getElementById('statCore').textContent = core;
+  document.getElementById('statBorder').textContent = border;
+  document.getElementById('statNoise').textContent = noise;
+  document.getElementById('statUnvisited').textContent = unvisited;
 }
 
-// ── STEPS ────────────────────────────────────────────────────────────────────
+// Section nav highlight
+function updateSectionNav(stepIdx) {
+  const btns = document.querySelectorAll('.sec-btn');
+  const sections = [0, 1, 2, 3, 6, 8, 10, 11, 12];
+  let active = 0;
+  for (let i = 0; i < sections.length; i++) {
+    if (stepIdx >= sections[i]) active = i;
+  }
+  btns.forEach((b, i) => b.classList.toggle('active', i === active));
+}
+
+// ── STEPS ──────────────────────────────────────────────────────────────────
 const STEPS = [
-  // ── 0: Init
   {
     title: 'Dataset Overview',
     desc: '30 points sit in 2D space: two dense clusters (left and right) plus 6 scattered noise points. DBSCAN will discover the clusters purely from local density — without being told how many clusters exist.',
     phase: 'Setup', examine: '—',
-    run() {
-      resetAll();
-    }
+    run() { resetAll(); }
   },
-
-  // ── 1: Pick p0, draw ε
   {
     title: 'Pick a Starting Point',
-    desc: 'DBSCAN selects an unvisited point at random — here <strong>p0</strong> (center-left cluster). We draw its <span class="hl-cyan">epsilon (ε) circle</span>. Anything inside this radius is a "neighbor" of p0. We will count them to decide what kind of point p0 is.',
+    desc: 'DBSCAN selects an unvisited point — here <strong>p0</strong> (center-left cluster). We draw its <span class="hl-cyan">epsilon (ε) circle</span>. Anything inside this radius is a neighbor of p0. We count them to decide what kind of point p0 is.',
     phase: 'Cluster 1', examine: 'p0',
     run() {
       resetAll();
       setActive(0);
-      showEps(0);
+      showEpsAnimated(0);
+      showNeighborBadge(0);
+      updateStats();
     }
   },
-
-  // ── 2: p0 → CORE, add frontier
   {
     title: 'p0 is a Core Point',
-    desc: 'Inside p0\'s ε-circle we find <strong>5 neighbors</strong>: p1, p2, p3, p4, p5. With p0 itself that\'s 6 points — well above <strong>MinPts = 4</strong>. So p0 is a <span class="hl-core">Core Point</span>. Its neighbors that are still unvisited are added to the <span class="hl-green">frontier queue</span> (green) to be explored next.',
+    desc: 'Inside p0\'s ε-circle: <strong>5 neighbors</strong> — p1, p2, p3, p4, p5. With p0 itself = 6 points ≥ MinPts = 4. p0 is a <span class="hl-core">Core Point</span>. All unvisited neighbors enter the <span class="hl-green">frontier queue</span> to be explored next.',
     phase: 'Cluster 1', examine: 'p0 → Core',
     run() {
       resetAll();
       setState(0, 'core');
       showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5']);
-      // All unvisited neighbors go to frontier
       [1,2,3,4,5].forEach(i => setState(i, 'frontier'));
       showLabels(0);
+      updateStats();
     }
   },
-
-  // ── 3: Take p1 from frontier, show ε
   {
     title: 'Examine Next: p1',
-    desc: 'We dequeue <strong>p1</strong> from the frontier. It becomes the active point and we draw its ε-circle. Count the neighbors: p0, p2, p5, p6 — that is <strong>4 neighbors</strong>. With p1 itself = 5 points ≥ MinPts. p1 is also a <span class="hl-core">Core Point</span>.',
+    desc: 'We dequeue <strong>p1</strong> from the frontier. Its ε-circle contains <strong>4 neighbors</strong>: p0, p2, p5, p6. With itself = 5 ≥ MinPts. p1 is also a <span class="hl-core">Core Point</span>.',
     phase: 'Cluster 1', examine: 'p1',
     run() {
       setState(0, 'core');
-      showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5']);
-      // p1 goes active (dequeued from frontier)
       setActive(1);
       [2,3,4,5].forEach(i => setState(i, 'frontier'));
-      showEps(1);
+      setState(0, 'core');
+      showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5']);
+      showEpsAnimated(1);
       showLabels(0);
+      showNeighborBadge(1);
+      updateStats();
     }
   },
-
-  // ── 4: p1 classified as core, p6 added to frontier
   {
-    title: 'p1 is a Core Point',
-    desc: 'p1 is confirmed <span class="hl-core">Core</span>. Its new unvisited neighbor <strong>p6</strong> is added to the frontier (green). Note that p0 is already classified (red) and p2/p5 were already queued — they are not re-queued. The cluster keeps growing through density-reachable core points.',
+    title: 'p1 Confirmed Core — p6 Added',
+    desc: 'p1 is confirmed <span class="hl-core">Core</span>. Its new unvisited neighbor <strong>p6</strong> joins the frontier. p0 is already classified so it is not re-queued. The cluster keeps expanding through density-reachable core points.',
     phase: 'Cluster 1', examine: 'p1 → Core',
     run() {
-      setState(0, 'core');
-      setState(1, 'core');
+      setState(0, 'core'); setState(1, 'core');
       showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6']);
       [2,3,4,5,6].forEach(i => setState(i, 'frontier'));
       showLabels(0, 1);
+      updateStats();
     }
   },
-
-  // ── 5: Take p2, examine
   {
     title: 'Examine Next: p2',
-    desc: 'We dequeue <strong>p2</strong>. Its ε-circle contains <strong>4 neighbors</strong>: p0, p1, p3, p7. With itself = 5 ≥ MinPts. p2 is a <span class="hl-core">Core Point</span>. New unvisited neighbor <strong>p7</strong> gets added to the frontier.',
+    desc: 'We dequeue <strong>p2</strong>. Its ε-circle holds <strong>4 neighbors</strong>: p0, p1, p3, p7. p2 is a <span class="hl-core">Core Point</span>. New unvisited neighbor <strong>p7</strong> is added to the frontier.',
     phase: 'Cluster 1', examine: 'p2',
     run() {
-      setState(0, 'core');
-      setState(1, 'core');
+      setState(0, 'core'); setState(1, 'core');
       setActive(2);
-      showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6','conn-2-3','conn-2-7']);
       [3,4,5,6,7].forEach(i => setState(i, 'frontier'));
-      showEps(2);
+      setState(0, 'core'); setState(1, 'core');
+      showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6','conn-2-3','conn-2-7']);
+      showEpsAnimated(2);
       showLabels(0, 1);
+      showNeighborBadge(2);
+      updateStats();
     }
   },
-
-  // ── 6: Take p6 from frontier, examine it
   {
-    title: 'Examine Next: p6',
-    desc: 'We dequeue <strong>p6</strong>, sitting on the outer edge. Its ε-circle contains only <strong>1 neighbor</strong> (p1). With itself = 2 — less than MinPts = 4. p6 cannot be a core point. But since it IS within ε of core point p1, it is classified as a <span class="hl-border">Border Point</span> — it belongs to the cluster but cannot expand it.',
+    title: 'Examine Next: p6 — Border Point',
+    desc: 'We dequeue <strong>p6</strong>, sitting on the outer edge. Its ε-circle contains only <strong>1 neighbor</strong> (p1). With itself = 2 — less than MinPts = 4. p6 cannot be a core point. But it IS within ε of core point p1, so it is a <span class="hl-border">Border Point</span> — it belongs to the cluster but cannot expand it.',
     phase: 'Cluster 1', examine: 'p6 → Border',
     run() {
       setState(0, 'core'); setState(1, 'core'); setState(2, 'core');
       setActive(6);
       showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6','conn-2-3','conn-2-7']);
       [3,4,5,7].forEach(i => setState(i, 'frontier'));
-      showEps(6);
+      showEpsAnimated(6);
       showLabels(0, 1, 2);
+      showNeighborBadge(6);
+      updateStats();
     }
   },
-
-  // ── 7: p6 classified border, take p7
   {
-    title: 'Examine Next: p7',
-    desc: 'p6 is labeled <span class="hl-border">Border</span>. Now we dequeue <strong>p7</strong>, the symmetric border point below. Same result: its ε-circle has only <strong>1 neighbor</strong> (p2). 2 points total < MinPts. It is also a <span class="hl-border">Border Point</span>. Border points define the outer shell of the cluster.',
+    title: 'Examine Next: p7 — Border Point',
+    desc: 'p6 is labeled <span class="hl-border">Border</span>. Now we dequeue <strong>p7</strong>. Same result: 1 neighbor (p2). 2 points total < MinPts. Also a <span class="hl-border">Border Point</span>. Border points define the outer shell of the cluster.',
     phase: 'Cluster 1', examine: 'p7 → Border',
     run() {
       setState(0, 'core'); setState(1, 'core'); setState(2, 'core');
@@ -762,67 +976,69 @@ const STEPS = [
       setActive(7);
       showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6','conn-2-3','conn-2-7']);
       [3,4,5].forEach(i => setState(i, 'frontier'));
-      showEps(7);
+      showEpsAnimated(7);
       showLabels(0, 1, 2, 6);
+      showNeighborBadge(7);
+      updateStats();
     }
   },
-
-  // ── 8: Complete Cluster 1 (show all classified)
   {
     title: 'Cluster 1 — Fully Classified',
-    desc: 'Processing continues for p3, p4, p5 (all <span class="hl-core">Core</span> with ≥ 3 neighbors each) and their border neighbors p8, p9, p10, p11. All 12 points are now classified: <strong>6 core points</strong> form the dense backbone, <strong>6 border points</strong> define the outer edge.',
+    desc: 'p3, p4, p5 are all <span class="hl-core">Core</span> (≥ 3 neighbors each). Their border neighbors p8–p11 are classified too. <strong>6 core points</strong> form the dense backbone, <strong>6 border points</strong> define the outer edge.',
     phase: 'Cluster 1', examine: 'Complete',
     run() {
       C1.forEach(i => setState(i, CLASS[i]));
       showConns(C1_CONNS);
       showLabels(...C1);
+      hideNeighborBadge();
+      showFF(true);
+      updateStats();
     }
   },
-
-  // ── 9: Paint Cluster 1 amber
   {
     title: 'Cluster 1 Complete',
-    desc: 'All 12 points of <span class="hl-c1">Cluster 1</span> are painted amber — core and border alike. DBSCAN moves on to find the next unvisited point. The noise points and Cluster 2 are still unvisited (dark).',
+    desc: 'All 12 points of <span class="hl-c1">Cluster 1</span> are painted amber — core and border alike. DBSCAN moves on to the next unvisited point. Cluster 2 and the isolated noise points are still unvisited.',
     phase: 'Cluster 1 ✓', examine: 'Done',
     run() {
       C1.forEach(i => setState(i, 'c1'));
       showConns(C1_CONNS);
       showLabels(...C1);
+      showFF(false);
+      updateStats();
     }
   },
-
-  // ── 10: Noise points discovered
-  {
-    title: 'Noise Points Discovered',
-    desc: 'DBSCAN picks each of the 6 isolated points in turn. Each one\'s ε-circle is completely empty — <strong>0 neighbors</strong>. With only 1 point (itself) inside ε, that is far below MinPts = 4. These points are not within ε of any core point either, so they are labeled <span class="hl-noise">Noise</span>.',
-    phase: 'Noise scan', examine: 'p24–p29',
-    run() {
-      C1.forEach(i => setState(i, 'c1'));
-      NOISE.forEach(i => setState(i, 'noise'));
-      showConns(C1_CONNS);
-      showEps(24, 25, 26, 27, 28, 29);
-      showLabels(...C1, ...NOISE);
-    }
-  },
-
-  // ── 11: Cluster 2 complete
   {
     title: 'Cluster 2 Discovered',
-    desc: 'DBSCAN finds an unvisited point in the right group and expands it the same way: 6 <span class="hl-core">core points</span> with ≥ 3 neighbors each, 6 <span class="hl-border">border points</span> with only 1 neighbor. All 12 form <span class="hl-c2">Cluster 2</span>. DBSCAN found both clusters without ever being told the cluster count!',
+    desc: 'DBSCAN picks the next unvisited point in the right group and expands it the same way: 6 <span class="hl-core">core points</span> with ≥ 3 neighbors each, 6 <span class="hl-border">border points</span>. All 12 form <span class="hl-c2">Cluster 2</span> — found without ever being told the cluster count.',
     phase: 'Cluster 2 ✓', examine: 'Done',
+    run() {
+      C1.forEach(i => setState(i, 'c1'));
+      C2.forEach(i => setState(i, 'c2'));
+      showConns([...C1_CONNS, ...C2_CONNS]);
+      showLabels(...C1, ...C2);
+      hideNeighborBadge();
+      showFF(false);
+      updateStats();
+    }
+  },
+  {
+    title: 'Noise Points Labeled Last',
+    desc: 'Only after all clusters are fully formed does DBSCAN visit the 6 isolated points. Each ε-circle is nearly empty — 1 point total (itself), far below MinPts = 4. None is within ε of any core point. <strong>Noise is a residual label</strong>, assigned only after the algorithm exhausts all density-reachable paths.',
+    phase: 'Noise ✓', examine: 'p24–p29',
     run() {
       C1.forEach(i => setState(i, 'c1'));
       C2.forEach(i => setState(i, 'c2'));
       NOISE.forEach(i => setState(i, 'noise'));
       showConns([...C1_CONNS, ...C2_CONNS]);
+      showEps(24, 25, 26, 27, 28, 29);
       showLabels(...C1, ...C2, ...NOISE);
+      hideNeighborBadge();
+      updateStats();
     }
   },
-
-  // ── 12: Concept — directly density-reachable
   {
     title: 'Concept: Directly Density-Reachable',
-    desc: '<strong>Directly density-reachable:</strong> point q is directly density-reachable from core point p if q falls inside p\'s ε-circle. Here, border point <strong>p6</strong> is directly density-reachable from core point <strong>p1</strong> because p6 lies within p1\'s ε-radius. The <span class="hl-cyan">cyan line</span> shows this direct connection.',
+    desc: '<strong>Directly density-reachable:</strong> point q is directly density-reachable from core point p if q falls inside p\'s ε-circle. Here, border point <strong>p6</strong> is directly density-reachable from core <strong>p1</strong> — p6 lies within p1\'s ε-radius. The animated <span class="hl-cyan">cyan line</span> shows this direct connection.',
     phase: 'Concepts', examine: 'p1 → p6',
     run() {
       C1.forEach(i => setState(i, CLASS[i]));
@@ -831,15 +1047,14 @@ const STEPS = [
       showConns([...C1_CONNS, ...C2_CONNS]);
       dimAll();
       highlight(1, 6);
-      showDL('dl-1-6');
+      showDLAnimated({id:'dl-1-6', delay:0});
       showLabels(1, 6);
+      updateStats();
     }
   },
-
-  // ── 13: Concept — density-reachable (chain)
   {
     title: 'Concept: Density-Reachable',
-    desc: '<strong>Density-reachable:</strong> q is density-reachable from p if there is a chain of core points p→c₁→c₂→…→q where each step is a direct density-reachable hop. Here: <strong>p0 → p1 → p2</strong> — each is a core point within ε of the next. So p2 is density-reachable from p0 through the chain.',
+    desc: '<strong>Density-reachable:</strong> q is density-reachable from p if there is a chain of core points p→c₁→…→q, each step a direct hop. Here: <strong>p0 → p1 → p2</strong> — each is a core within ε of the next. The chain animates step by step.',
     phase: 'Concepts', examine: 'p0→p1→p2',
     run() {
       C1.forEach(i => setState(i, CLASS[i]));
@@ -848,15 +1063,14 @@ const STEPS = [
       showConns([...C1_CONNS, ...C2_CONNS]);
       dimAll();
       highlight(0, 1, 2);
-      showDL('dl-0-1', 'dl-1-2');
+      showDLAnimated({id:'dl-0-1', delay:0}, {id:'dl-1-2', delay:1});
       showLabels(0, 1, 2);
+      updateStats();
     }
   },
-
-  // ── 14: Concept — density-connected
   {
     title: 'Concept: Density-Connected',
-    desc: '<strong>Density-connected:</strong> two points are density-connected if there exists a core point from which both are density-reachable. Central core <strong>p0</strong> reaches border point <strong>p6</strong> via the chain p0→p1→p6, and reaches border point <strong>p7</strong> via the chain p0→p2→p7. Both chains radiate from p0 in opposite directions — so p6 and p7 are density-connected through p0, which is why they belong to the same cluster.',
+    desc: '<strong>Density-connected:</strong> two points are density-connected if there exists a core point from which both are density-reachable. Core <strong>p0</strong> reaches <strong>p6</strong> via p0→p1→p6 and reaches <strong>p7</strong> via p0→p2→p7. Both chains radiate from p0 — so p6 and p7 belong to the same cluster.',
     phase: 'Concepts', examine: 'p6 ↔ p7',
     run() {
       C1.forEach(i => setState(i, CLASS[i]));
@@ -865,29 +1079,77 @@ const STEPS = [
       showConns([...C1_CONNS, ...C2_CONNS]);
       dimAll();
       highlight(0, 1, 2, 6, 7);
-      showDL('dl-0-1b', 'dl-1-6b', 'dl-0-2', 'dl-2-7');
+      showDLAnimated(
+        {id:'dl-0-1b', delay:0},
+        {id:'dl-1-6b', delay:1},
+        {id:'dl-0-2',  delay:2},
+        {id:'dl-2-7',  delay:3}
+      );
       showLabels(0, 6, 7);
+      updateStats();
     }
   },
-
-  // ── 15: Final — not density-connected across clusters
   {
     title: 'Not Density-Connected Across Clusters',
-    desc: 'Points from different clusters are <strong>never density-connected</strong> — there is no chain of core points that bridges the gap between the two groups. The inter-cluster distance exceeds ε, so no core from Cluster 1 is a neighbor of any core from Cluster 2. DBSCAN separates them correctly with zero prior knowledge.',
+    desc: 'Points from different clusters are <strong>never density-connected</strong> — no chain of core points bridges the gap between the two groups. The inter-cluster distance exceeds ε, so DBSCAN separates them correctly with zero prior knowledge of cluster count.',
     phase: 'Final', examine: 'Summary',
     run() {
       C1.forEach(i => setState(i, 'c1'));
       C2.forEach(i => setState(i, 'c2'));
       NOISE.forEach(i => setState(i, 'noise'));
       showConns([...C1_CONNS, ...C2_CONNS]);
+      showDL();
       showLabels(...C1, ...C2, ...NOISE);
+      updateStats();
     }
   }
 ];
 
-// ── RENDER ───────────────────────────────────────────────────────────────────
+// ── PLAYBACK ──────────────────────────────────────────────────────────────
 let cur = 0;
+let playing = false;
+let playTimer = null;
+let playSpeed = 1800;
 
+function updateSpeed() {
+  playSpeed = parseInt(document.getElementById('speedSel').value);
+  if (playing) { clearInterval(playTimer); startPlay(); }
+}
+
+function startPlay() {
+  playTimer = setInterval(() => {
+    if (cur >= STEPS.length - 1) { stopPlay(); return; }
+    cur++; render();
+  }, playSpeed);
+}
+
+function stopPlay() {
+  clearInterval(playTimer);
+  playing = false;
+  const btn = document.getElementById('btnPlay');
+  btn.textContent = '▶ Play';
+  btn.classList.remove('playing');
+}
+
+function togglePlay() {
+  if (playing) {
+    stopPlay();
+  } else {
+    playing = true;
+    const btn = document.getElementById('btnPlay');
+    btn.textContent = '⏸ Pause';
+    btn.classList.add('playing');
+    startPlay();
+  }
+}
+
+function jumpTo(stepIdx) {
+  stopPlay();
+  cur = stepIdx;
+  render();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
 function buildProgress() {
   const el = document.getElementById('progress');
   el.innerHTML = '';
@@ -907,7 +1169,9 @@ function render() {
   document.getElementById('examineVal').textContent = s.examine;
   document.getElementById('btnPrev').disabled = cur === 0;
   document.getElementById('btnNext').disabled = cur === STEPS.length - 1;
+  if (cur === STEPS.length - 1) stopPlay();
   buildProgress();
+  updateSectionNav(cur);
   s.run();
 }
 
@@ -915,8 +1179,9 @@ function nextStep() { if (cur < STEPS.length - 1) { cur++; render(); } }
 function prevStep() { if (cur > 0) { cur--; render(); } }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight') nextStep();
-  if (e.key === 'ArrowLeft')  prevStep();
+  if (e.key === 'ArrowRight') { stopPlay(); nextStep(); }
+  if (e.key === 'ArrowLeft')  { stopPlay(); prevStep(); }
+  if (e.key === ' ') { e.preventDefault(); togglePlay(); }
 });
 
 render();
