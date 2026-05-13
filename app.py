@@ -497,7 +497,7 @@ elif st.session_state.page == "explainer":
         )
 
     st.markdown("<div class='explainer-frame'>", unsafe_allow_html=True)
-    components.html(html_content, height=1500, scrolling=False)
+    components.html(html_content, height=4000, scrolling=False)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ═════════════════════════════════════════════════════════════════════════════

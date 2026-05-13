@@ -452,6 +452,117 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   max-height: 640px;
   background: var(--bg);
 }
+
+/* ── PYTHON SECTION ── */
+.python-section {
+  max-width: 1240px;
+  width: 100%;
+  margin-top: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+.python-section h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.python-section > p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.code-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.code-tab {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.code-tab:hover { border-color: var(--cyan); color: var(--cyan); }
+.code-tab.active {
+  background: rgba(0,212,255,0.12);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.code-block {
+  display: none;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.code-block.active { display: block; }
+
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+}
+.code-header span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.copy-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.copy-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+pre {
+  margin: 0;
+  padding: 20px 24px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+code {
+  font-family: inherit;
+  background: none;
+  padding: 0;
+}
+
+/* Syntax highlighting colors */
+.kw { color: #ff7b72; }   /* keyword */
+.fn { color: #d2a8ff; }   /* function */
+.st { color: #a5d6ff; }   /* string */
+.nu { color: #79c0ff; }   /* number */
+.co { color: #8b949e; font-style: italic; } /* comment */
+.va { color: #ffa657; }   /* variable/parameter */
+.cl { color: #7ee787; }   /* class */
+.op { color: #ff7b72; }   /* operator */
+.bu { color: #79c0ff; }   /* builtin */
 </style>
 </head>
 <body>
@@ -740,6 +851,188 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
       <source src="DBSCAN.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
+  </div>
+</div>
+
+<!-- PYTHON IMPLEMENTATION SECTION -->
+<div class="python-section">
+  <h2>▸ Python Implementation</h2>
+  <p>Two ways to run DBSCAN: from scratch (educational) and via scikit-learn (production).</p>
+
+  <div class="code-tabs">
+    <button class="code-tab active" onclick="switchTab('raw')">Raw Algorithm</button>
+    <button class="code-tab" onclick="switchTab('sklearn')">sklearn DBSCAN</button>
+  </div>
+
+  <!-- Raw Implementation -->
+  <div class="code-block active" id="tab-raw">
+    <div class="code-header">
+      <span>dbscan_from_scratch.py</span>
+      <button class="copy-btn" onclick="copyCode('raw')">Copy</button>
+    </div>
+    <pre><code><span class="co">#!/usr/bin/env python3</span>
+<span class="co">"""Raw DBSCAN implementation matching the visualization above.</span>
+<span class="co">   ε = 45 (pixel distance), MinPts = 4."""</span>
+
+<span class="kw">import</span> math
+<span class="kw">from</span> collections <span class="kw">import</span> deque
+
+
+<span class="kw">def</span> <span class="fn">euclidean</span>(<span class="va">a</span>, <span class="va">b</span>):
+    <span class="co">"""2-D Euclidean distance."""</span>
+    <span class="kw">return</span> math.sqrt((a[<span class="nu">0</span>] - b[<span class="nu">0</span>])**<span class="nu">2</span> + (a[<span class="nu">1</span>] - b[<span class="nu">1</span>])**<span class="nu">2</span>)
+
+
+<span class="kw">def</span> <span class="fn">region_query</span>(<span class="va">points</span>, <span class="va">p_idx</span>, <span class="va">eps</span>):
+    <span class="co">"""Return indices of all points within ε of points[p_idx]."""</span>
+    neighbors = []
+    <span class="kw">for</span> i, q <span class="kw">in</span> <span class="bu">enumerate</span>(points):
+        <span class="kw">if</span> euclidean(points[p_idx], q) <= eps:
+            neighbors.append(i)
+    <span class="kw">return</span> neighbors
+
+
+<span class="kw">def</span> <span class="fn">dbscan</span>(<span class="va">points</span>, <span class="va">eps</span>, <span class="va">min_pts</span>):
+    <span class="co">"""</span>
+<span class="co">    Returns:</span>
+<span class="co">        labels : list[int]  —  cluster id or -1 for noise</span>
+<span class="co">        types  : list[str]  —  'core', 'border', or 'noise'</span>
+<span class="co">    """</span>
+    n = <span class="bu">len</span>(points)
+    labels = [<span class="op">-</span><span class="nu">1</span>] * n          <span class="co"># -1 = unvisited / noise</span>
+    types  = [<span class="st">'noise'</span>] * n
+    visited = [<span class="va">False</span>] * n
+    cluster_id = <span class="nu">0</span>
+
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):
+        <span class="kw">if</span> visited[i]:
+            <span class="kw">continue</span>
+
+        visited[i] = <span class="va">True</span>
+        neighbors = region_query(points, i, eps)
+
+        <span class="co"># ── Not enough neighbors → mark as noise (for now) ──</span>
+        <span class="kw">if</span> <span class="bu">len</span>(neighbors) < min_pts:
+            labels[i] = <span class="op">-</span><span class="nu">1</span>
+            <span class="kw">continue</span>
+
+        <span class="co"># ── Core point found → start a new cluster ──</span>
+        types[i] = <span class="st">'core'</span>
+        labels[i] = cluster_id
+
+        <span class="co"># Frontier queue of points to expand</span>
+        frontier = deque(neighbors)
+        j = <span class="nu">0</span>
+        <span class="kw">while</span> j < <span class="bu">len</span>(frontier):
+            q_idx = frontier[j]
+            j += <span class="nu">1</span>
+
+            <span class="kw">if</span> labels[q_idx] == <span class="op">-</span><span class="nu">1</span>:
+                <span class="co"># Was previously marked noise → now border</span>
+                labels[q_idx] = cluster_id
+                types[q_idx] = <span class="st">'border'</span>
+
+            <span class="kw">if</span> visited[q_idx]:
+                <span class="kw">continue</span>
+
+            visited[q_idx] = <span class="va">True</span>
+            q_neighbors = region_query(points, q_idx, eps)
+
+            <span class="kw">if</span> <span class="bu">len</span>(q_neighbors) >= min_pts:
+                <span class="co"># q is also core → expand frontier</span>
+                types[q_idx] = <span class="st">'core'</span>
+                <span class="kw">for</span> nb <span class="kw">in</span> q_neighbors:
+                    <span class="kw">if</span> nb <span class="op">not</span> <span class="kw">in</span> frontier:
+                        frontier.append(nb)
+            <span class="kw">else</span>:
+                <span class="co"># q is border</span>
+                types[q_idx] = <span class="st">'border'</span>
+                labels[q_idx] = cluster_id
+
+        cluster_id += <span class="nu">1</span>
+
+    <span class="kw">return</span> labels, types
+
+
+<span class="co"># ── Demo with the 30 points from the visualization ──</span>
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    <span class="co"># Coordinates match the SVG cx/cy values above</span>
+    POINTS = [
+        (<span class="nu">220</span>,<span class="nu">230</span>), (<span class="nu">250</span>,<span class="nu">210</span>), (<span class="nu">250</span>,<span class="nu">250</span>), (<span class="nu">220</span>,<span class="nu">270</span>), (<span class="nu">190</span>,<span class="nu">250</span>),
+        (<span class="nu">190</span>,<span class="nu">210</span>), (<span class="nu">290</span>,<span class="nu">190</span>), (<span class="nu">290</span>,<span class="nu">270</span>), (<span class="nu">220</span>,<span class="nu">310</span>), (<span class="nu">150</span>,<span class="nu">270</span>),
+        (<span class="nu">150</span>,<span class="nu">190</span>), (<span class="nu">220</span>,<span class="nu">180</span>), (<span class="nu">560</span>,<span class="nu">230</span>), (<span class="nu">590</span>,<span class="nu">210</span>), (<span class="nu">590</span>,<span class="nu">250</span>),
+        (<span class="nu">560</span>,<span class="nu">270</span>), (<span class="nu">530</span>,<span class="nu">250</span>), (<span class="nu">530</span>,<span class="nu">210</span>), (<span class="nu">630</span>,<span class="nu">190</span>), (<span class="nu">630</span>,<span class="nu">270</span>),
+        (<span class="nu">560</span>,<span class="nu">310</span>), (<span class="nu">490</span>,<span class="nu">270</span>), (<span class="nu">490</span>,<span class="nu">190</span>), (<span class="nu">560</span>,<span class="nu">180</span>), (<span class="nu">390</span>,<span class="nu">100</span>),
+        (<span class="nu">390</span>,<span class="nu">360</span>), (<span class="nu">80</span>, <span class="nu">150</span>), (<span class="nu">80</span>, <span class="nu">310</span>), (<span class="nu">700</span>,<span class="nu">150</span>), (<span class="nu">700</span>,<span class="nu">310</span>)
+    ]
+
+    labels, types = dbscan(POINTS, eps=<span class="nu">45</span>, min_pts=<span class="nu">4</span>)
+
+    <span class="bu">print</span>(<span class="st">"Cluster labels :"</span>, labels)
+    <span class="bu">print</span>(<span class="st">"Point types  :"</span>, types)
+    <span class="bu">print</span>(<span class="st">f"Clusters found: {max(labels)+1}"</span>)</code></pre>
+  </div>
+
+  <!-- sklearn Implementation -->
+  <div class="code-block" id="tab-sklearn">
+    <div class="code-header">
+      <span>sklearn_dbscan.py</span>
+      <button class="copy-btn" onclick="copyCode('sklearn')">Copy</button>
+    </div>
+    <pre><code><span class="co">#!/usr/bin/env python3</span>
+<span class="co">"""Production DBSCAN using scikit-learn."""</span>
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.cluster <span class="kw">import</span> DBSCAN
+
+
+<span class="co"># ── 1. Build the same 30-point dataset ──</span>
+POINTS = np.array([
+    [<span class="nu">220</span>,<span class="nu">230</span>], [<span class="nu">250</span>,<span class="nu">210</span>], [<span class="nu">250</span>,<span class="nu">250</span>], [<span class="nu">220</span>,<span class="nu">270</span>], [<span class="nu">190</span>,<span class="nu">250</span>],
+    [<span class="nu">190</span>,<span class="nu">210</span>], [<span class="nu">290</span>,<span class="nu">190</span>], [<span class="nu">290</span>,<span class="nu">270</span>], [<span class="nu">220</span>,<span class="nu">310</span>], [<span class="nu">150</span>,<span class="nu">270</span>],
+    [<span class="nu">150</span>,<span class="nu">190</span>], [<span class="nu">220</span>,<span class="nu">180</span>], [<span class="nu">560</span>,<span class="nu">230</span>], [<span class="nu">590</span>,<span class="nu">210</span>], [<span class="nu">590</span>,<span class="nu">250</span>],
+    [<span class="nu">560</span>,<span class="nu">270</span>], [<span class="nu">530</span>,<span class="nu">250</span>], [<span class="nu">530</span>,<span class="nu">210</span>], [<span class="nu">630</span>,<span class="nu">190</span>], [<span class="nu">630</span>,<span class="nu">270</span>],
+    [<span class="nu">560</span>,<span class="nu">310</span>], [<span class="nu">490</span>,<span class="nu">270</span>], [<span class="nu">490</span>,<span class="nu">190</span>], [<span class="nu">560</span>,<span class="nu">180</span>], [<span class="nu">390</span>,<span class="nu">100</span>],
+    [<span class="nu">390</span>,<span class="nu">360</span>], [<span class="nu">80</span>, <span class="nu">150</span>], [<span class="nu">80</span>, <span class="nu">310</span>], [<span class="nu">700</span>,<span class="nu">150</span>], [<span class="nu">700</span>,<span class="nu">310</span>]
+])
+
+<span class="co"># ── 2. Fit DBSCAN ──</span>
+<span class="co"># eps=45 matches the ε-circle radius in the visualization.</span>
+<span class="co"># min_samples=4 matches MinPts (including the point itself).</span>
+clustering = DBSCAN(eps=<span class="nu">45</span>, min_samples=<span class="nu">4</span>).fit(POINTS)
+
+labels = clustering.labels_   <span class="co"># -1 == noise</span>
+
+<span class="co"># ── 3. Inspect results ──</span>
+n_clusters = <span class="bu">len</span>(<span class="bu">set</span>(labels)) - (<span class="nu">1</span> <span class="kw">if</span> <span class="op">-</span><span class="nu">1</span> <span class="kw">in</span> labels <span class="kw">else</span> <span class="nu">0</span>)
+n_noise    = <span class="bu">list</span>(labels).count(<span class="op">-</span><span class="nu">1</span>)
+
+<span class="bu">print</span>(<span class="st">f"Estimated clusters : {n_clusters}"</span>)   <span class="co"># → 2</span>
+<span class="bu">print</span>(<span class="st">f"Noise points      : {n_noise}"</span>)        <span class="co"># → 6</span>
+<span class="bu">print</span>(<span class="st">"Labels per point  :"</span>, labels)
+
+<span class="co"># ── 4. (Optional) Core-sample indices ──</span>
+<span class="co"># sklearn exposes which points were used as "core" internally.</span>
+core_mask = np.zeros_like(labels, dtype=<span class="bu">bool</span>)
+core_mask[clustering.core_sample_indices_] = <span class="va">True</span>
+
+<span class="bu">print</span>(<span class="st">"\nCore point mask   :"</span>, core_mask.astype(<span class="bu">int</span>))
+
+<span class="co"># ── 5. Predict on new data (using nearest cluster) ──</span>
+<span class="co"># DBSCAN itself is not inductive, but we can assign new points</span>
+<span class="co"># to the nearest existing cluster label manually:</span>
+<span class="kw">from</span> sklearn.neighbors <span class="kw">import</span> NearestNeighbors
+
+nn = NearestNeighbors(n_neighbors=<span class="nu">1</span>).fit(POINTS[labels != <span class="op">-</span><span class="nu">1</span>])
+new_pts = np.array([[<span class="nu">230</span>, <span class="nu">220</span>], [<span class="nu">600</span>, <span class="nu">200</span>], [<span class="nu">50</span>, <span class="nu">50</span>]])  <span class="co"># last one is far away</span>
+_, idx = nn.kneighbors(new_pts)
+new_labels = labels[labels != <span class="op">-</span><span class="nu">1</span>][idx.ravel()]
+
+<span class="co"># Re-mark obvious outliers as noise via a distance threshold</span>
+distances, _ = nn.kneighbors(new_pts)
+new_labels[distances.ravel() > <span class="nu">45</span>] = <span class="op">-</span><span class="nu">1</span>
+
+<span class="bu">print</span>(<span class="st">"\nNew point labels  :"</span>, new_labels)</code></pre>
   </div>
 </div>
 
@@ -1236,6 +1529,25 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft')  { stopPlay(); prevStep(); }
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
 });
+
+// ── PYTHON TAB & COPY LOGIC ───────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.code-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.code-block').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.code-tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+  document.getElementById(`tab-${tab}`).classList.add('active');
+}
+
+function copyCode(tab) {
+  const code = document.querySelector(`#tab-${tab} code`).innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.querySelector(`#tab-${tab} .copy-btn`);
+    const old = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = old; btn.style.color = ''; }, 1500);
+  });
+}
 
 render();
 </script>
