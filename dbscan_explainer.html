@@ -413,6 +413,45 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   margin-top: 8px;
 }
 .ff-notice.visible { display: block; }
+
+/* ── VIDEO SECTION ── */
+.video-section {
+  max-width: 1240px;
+  width: 100%;
+  margin-top: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+.video-header {
+  margin-bottom: 16px;
+}
+.video-header h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.video-header p {
+  color: var(--muted);
+  font-size: 13px;
+}
+.video-wrapper {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+.video-wrapper video {
+  width: 100%;
+  display: block;
+  max-height: 640px;
+  background: var(--bg);
+}
 </style>
 </head>
 <body>
@@ -687,6 +726,20 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
       <div class="legend-item"><div class="legend-dot ld-c1"></div>Cluster 1</div>
       <div class="legend-item"><div class="legend-dot ld-c2"></div>Cluster 2</div>
     </div>
+  </div>
+</div>
+
+<!-- VIDEO SECTION -->
+<div class="video-section">
+  <div class="video-header">
+    <h2>▸ Video Walkthrough</h2>
+    <p>Full animation of the DBSCAN algorithm in action</p>
+  </div>
+  <div class="video-wrapper">
+    <video controls preload="metadata">
+      <source src="DBSCAN.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
   </div>
 </div>
 

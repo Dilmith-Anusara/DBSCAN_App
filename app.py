@@ -1,4 +1,5 @@
 import os
+import base64   
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
@@ -483,10 +484,20 @@ elif st.session_state.page == "explainer":
             st.session_state.page = "dashboard"
             st.rerun()
 
-    # Embed the HTML visualizer
     html_content = load_explainer_html()
+
+    # Embed the local MP4 as base64 so the iframe can play it
+    video_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DBSCAN.mp4")
+    if os.path.exists(video_path):
+        with open(video_path, "rb") as f:
+            video_b64 = base64.b64encode(f.read()).decode()
+        html_content = html_content.replace(
+            'src="DBSCAN.mp4"',
+            f'src="data:video/mp4;base64,{video_b64}"'
+        )
+
     st.markdown("<div class='explainer-frame'>", unsafe_allow_html=True)
-    components.html(html_content, height=720, scrolling=False)
+    components.html(html_content, height=1500, scrolling=False)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -723,7 +734,7 @@ elif st.session_state.page == "dashboard":
         for axis in ["xaxis","yaxis","xaxis2","yaxis2"]:
             fig2.update_layout(**{axis: dict(showgrid=True, gridcolor=GRID_COL,
                                              zeroline=False, tickfont=dict(color=TICK_COL, size=9))})
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, use_container_width=True, key="tab2_fig2")
 
         if dataset in ["Moons", "Concentric Circles"]:
             st.markdown(
@@ -737,6 +748,71 @@ elif st.session_state.page == "dashboard":
                 '<span class="status-badge badge-warn">Both algorithms work on blob data — try Moons or Concentric Circles to see K-Means fail</span>',
                 unsafe_allow_html=True
             )
+
+        # ── Comparison Table ──────────────────────────────────────────────────
+        st.markdown("<div style='margin-top:2rem'></div>", unsafe_allow_html=True)
+        st.markdown(
+            '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:600;'
+            'text-transform:uppercase;letter-spacing:0.14em;color:#00b8d4;margin-bottom:14px;">'
+            'Algorithm Comparison</p>',
+            unsafe_allow_html=True
+        )
+
+        COMPARISON_ROWS = [
+            ("Clustering Method",        "Density-Based",  "Centroid-Based", None),
+            ("Needs Number of Clusters", "No",             "Yes",            "dbscan"),
+            ("Outlier Detection",        "Excellent",      "Poor",           "dbscan"),
+            ("Arbitrary Shapes",         "Yes",            "No",             "dbscan"),
+            ("High-Dimensional Data",    "Poor",           "Better",         "kmeans"),
+            ("Noise Sensitivity",        "Low",            "High",           "dbscan"),
+            ("Speed",                    "Moderate",       "Fast",           "kmeans"),
+        ]
+
+        def cell_style(winner, col):
+            if winner == "dbscan" and col == "dbscan":
+                return "color:#34d399;font-weight:600;"
+            elif winner == "dbscan" and col == "kmeans":
+                return "color:#f87171;font-weight:600;"
+            elif winner == "kmeans" and col == "kmeans":
+                return "color:#34d399;font-weight:600;"
+            elif winner == "kmeans" and col == "dbscan":
+                return "color:#f87171;font-weight:600;"
+            return "color:#8a95a8;"
+
+        rows_html = ""
+        for i, (feature, dbscan_val, kmeans_val, winner) in enumerate(COMPARISON_ROWS):
+            row_bg = "#0d1220" if i % 2 == 0 else "#080b10"
+            ds_style = cell_style(winner, "dbscan")
+            km_style = cell_style(winner, "kmeans")
+            kmeans_display = "Yes ↑ manual" if (feature == "Needs Number of Clusters" and kmeans_val == "Yes") else kmeans_val
+
+            row = (
+                f'<tr style="background:{row_bg};border-bottom:1px solid #141824;">'
+                f'<td style="padding:11px 16px;font-size:12.5px;color:#dde4ee;font-family:\'IBM Plex Sans\',sans-serif;white-space:nowrap;">{feature}</td>'
+                f'<td style="padding:11px 20px;font-size:12.5px;{ds_style}font-family:\'IBM Plex Mono\',monospace;text-align:center;">{dbscan_val}</td>'
+                f'<td style="padding:11px 20px;font-size:12.5px;{km_style}font-family:\'IBM Plex Mono\',monospace;text-align:center;">{kmeans_display}</td>'
+                f'</tr>'
+            )
+            rows_html += row
+
+        table_html = (
+            '<div style="border:1px solid #141824;border-radius:10px;overflow:hidden;">'
+            '<table style="width:100%;border-collapse:collapse;">'
+            '<thead>'
+            '<tr style="background:#060810;border-bottom:1px solid #1e2538;">'
+            '<th style="padding:11px 16px;text-align:left;font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:#5a6474;">Feature</th>'
+            '<th style="padding:11px 20px;text-align:center;font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:#00b8d4;">DBSCAN</th>'
+            '<th style="padding:11px 20px;text-align:center;font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:#f97316;">K-Means</th>'
+            '</tr>'
+            '</thead>'
+            f'<tbody>{rows_html}</tbody>'
+            '</table>'
+            '</div>'
+            '<p style="font-size:11px;color:#2e3748;margin-top:8px;font-family:\'IBM Plex Mono\',monospace;">'
+            'Green = advantage &nbsp;·&nbsp; Red = disadvantage</p>'
+        )
+
+        st.markdown(table_html, unsafe_allow_html=True)
 
         st.markdown("<div style='margin-top:1.5rem'></div>", unsafe_allow_html=True)
         with st.expander("Why does K-Means fail on non-convex shapes?"):
