@@ -488,6 +488,9 @@ elif st.session_state.page == "explainer":
 
     # Embed the local MP4 as base64 so the iframe can play it
     video_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DBSCAN.mp4")
+    if not os.path.exists(video_path):
+        video_path = os.path.join(os.getcwd(), "DBSCAN.mp4")
+
     if os.path.exists(video_path):
         with open(video_path, "rb") as f:
             video_b64 = base64.b64encode(f.read()).decode()
