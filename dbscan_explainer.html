@@ -68,7 +68,6 @@ h1 {
   margin-top: 2px;
 }
 
-/* ── LIVE STATS BAR ── */
 .stats-bar {
   display: flex;
   gap: 10px;
@@ -84,11 +83,7 @@ h1 {
   padding: 5px 12px;
   font-size: 12px;
 }
-.stat-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+.stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .stat-label { color: var(--muted); }
 .stat-value {
   font-family: 'JetBrains Mono', monospace;
@@ -99,7 +94,6 @@ h1 {
   transition: color 0.3s;
 }
 
-/* ── SECTION NAV ── */
 .section-nav {
   display: flex;
   gap: 6px;
@@ -122,7 +116,6 @@ h1 {
 .sec-btn:hover { border-color: var(--cyan); color: var(--cyan); }
 .sec-btn.active { background: rgba(0,212,255,0.12); border-color: var(--cyan); color: var(--cyan); }
 
-/* ── MAIN LAYOUT ── */
 .main-container {
   display: flex;
   gap: 20px;
@@ -133,7 +126,6 @@ h1 {
   flex-wrap: wrap;
 }
 
-/* ── VIZ PANEL ── */
 .viz-panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -144,7 +136,6 @@ h1 {
 
 svg { display: block; border-radius: 10px; background: var(--bg); }
 
-/* SVG elements */
 .point-circle {
   fill: var(--surface2);
   stroke: var(--border2);
@@ -152,7 +143,6 @@ svg { display: block; border-radius: 10px; background: var(--bg); }
   transition: fill 0.35s ease, stroke 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
 }
 
-/* Animated epsilon ring */
 .epsilon-circle {
   fill: none;
   stroke: var(--cyan);
@@ -164,7 +154,6 @@ svg { display: block; border-radius: 10px; background: var(--bg); }
 }
 .epsilon-circle.visible { opacity: 0.5; }
 
-/* Animated epsilon — scales in */
 @keyframes epsIn {
   from { r: 10; opacity: 0; }
   to   { r: 45; opacity: 0.5; }
@@ -181,7 +170,6 @@ svg { display: block; border-radius: 10px; background: var(--bg); }
 }
 .connection-line.visible { opacity: 0.22; }
 
-/* Density lines with draw animation */
 .density-line {
   stroke-width: 2.5;
   stroke-linecap: round;
@@ -198,9 +186,7 @@ svg { display: block; border-radius: 10px; background: var(--bg); }
 .density-line.visible.delay2 { animation-delay: 0.6s; }
 .density-line.visible.delay3 { animation-delay: 0.9s; }
 
-@keyframes drawLine {
-  to { stroke-dashoffset: 0; }
-}
+@keyframes drawLine { to { stroke-dashoffset: 0; } }
 
 .label-text {
   font-family: 'JetBrains Mono', monospace;
@@ -213,7 +199,6 @@ svg { display: block; border-radius: 10px; background: var(--bg); }
 }
 .label-text.visible { opacity: 1; }
 
-/* Point states */
 .point[data-state="unvisited"] .point-circle { fill: var(--surface2); stroke: var(--border2); }
 .point[data-state="active"]    .point-circle { fill: var(--surface2); stroke: var(--cyan); stroke-width: 2.5; }
 .point[data-state="frontier"]  .point-circle { fill: var(--green); stroke: var(--green); }
@@ -229,7 +214,6 @@ svg { display: block; border-radius: 10px; background: var(--bg); }
 @keyframes pulseRing { 0%,100% { r:7; } 50% { r:10; } }
 .point[data-pulsing="true"] .point-circle { animation: pulseRing 1.2s infinite ease-in-out; }
 
-/* ── CONTROLS ── */
 .controls {
   display: flex;
   align-items: center;
@@ -268,10 +252,8 @@ button:active:not(:disabled) { transform: scale(0.97); }
 }
 .btn-play:hover { background: rgba(0,212,255,0.25); }
 .btn-play.playing { background: rgba(240,64,64,0.15); color: var(--red); border-color: rgba(240,64,64,0.35); }
-
 button:disabled { opacity: 0.3; cursor: not-allowed; }
 
-/* Speed selector */
 .speed-wrap {
   display: flex;
   align-items: center;
@@ -303,7 +285,6 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .hint { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; opacity: 0.5; }
 
-/* ── INFO PANEL ── */
 .info-panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -363,7 +344,6 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
 .param-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
 .param-value { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--cyan); }
 
-/* Neighbor card */
 .neighbor-card {
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -388,7 +368,6 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
 .verdict-border { background: rgba(77,157,224,0.15); color: var(--blue); }
 .verdict-noise  { background: rgba(90,100,116,0.15); color: var(--gray); }
 
-/* Legend */
 .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
 .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
 .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 2px solid transparent; }
@@ -401,7 +380,6 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
 .ld-c2        { background: var(--teal); }
 .ld-noise     { background: var(--gray); }
 
-/* FF notice */
 .ff-notice {
   background: rgba(245,166,35,0.08);
   border: 1px solid rgba(245,166,35,0.25);
@@ -414,7 +392,7 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
 }
 .ff-notice.visible { display: block; }
 
-/* ── VIDEO SECTION ── */
+/* VIDEO */
 .video-section {
   max-width: 1240px;
   width: 100%;
@@ -424,10 +402,7 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   border-radius: 16px;
   padding: 24px;
 }
-.video-header {
-  margin-bottom: 16px;
-}
-.video-header h2 {
+.video-section h2 {
   font-family: 'JetBrains Mono', monospace;
   font-size: 18px;
   font-weight: 700;
@@ -435,10 +410,7 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   letter-spacing: 0.04em;
   margin-bottom: 4px;
 }
-.video-header p {
-  color: var(--muted);
-  font-size: 13px;
-}
+.video-section p { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
 .video-wrapper {
   width: 100%;
   border-radius: 12px;
@@ -446,14 +418,9 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   background: var(--bg);
   border: 1px solid var(--border);
 }
-.video-wrapper video {
-  width: 100%;
-  display: block;
-  max-height: 640px;
-  background: var(--bg);
-}
+.video-wrapper video { width: 100%; display: block; max-height: 640px; background: var(--bg); }
 
-/* ── PYTHON SECTION ── */
+/* PYTHON */
 .python-section {
   max-width: 1240px;
   width: 100%;
@@ -471,18 +438,9 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   letter-spacing: 0.04em;
   margin-bottom: 4px;
 }
-.python-section > p {
-  color: var(--muted);
-  font-size: 13px;
-  margin-bottom: 20px;
-}
+.python-section > p { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
 
-.code-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
+.code-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .code-tab {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
@@ -495,19 +453,9 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   transition: all 0.2s;
 }
 .code-tab:hover { border-color: var(--cyan); color: var(--cyan); }
-.code-tab.active {
-  background: rgba(0,212,255,0.12);
-  border-color: var(--cyan);
-  color: var(--cyan);
-}
+.code-tab.active { background: rgba(0,212,255,0.12); border-color: var(--cyan); color: var(--cyan); }
 
-.code-block {
-  display: none;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-}
+.code-block { display: none; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 .code-block.active { display: block; }
 
 .code-header {
@@ -547,22 +495,16 @@ pre {
   line-height: 1.7;
   color: var(--text);
 }
-code {
-  font-family: inherit;
-  background: none;
-  padding: 0;
-}
+code { font-family: inherit; background: none; padding: 0; }
 
-/* Syntax highlighting colors */
-.kw { color: #ff7b72; }   /* keyword */
-.fn { color: #d2a8ff; }   /* function */
-.st { color: #a5d6ff; }   /* string */
-.nu { color: #79c0ff; }   /* number */
-.co { color: #8b949e; font-style: italic; } /* comment */
-.va { color: #ffa657; }   /* variable/parameter */
-.cl { color: #7ee787; }   /* class */
-.op { color: #ff7b72; }   /* operator */
-.bu { color: #79c0ff; }   /* builtin */
+.kw { color: #ff7b72; }
+.fn { color: #d2a8ff; }
+.st { color: #a5d6ff; }
+.nu { color: #79c0ff; }
+.co { color: #8b949e; font-style: italic; }
+.va { color: #ffa657; }
+.op { color: #ff7b72; }
+.bu { color: #79c0ff; }
 </style>
 </head>
 <body>
@@ -597,7 +539,6 @@ code {
     </div>
   </div>
 
-  <!-- Section jump nav -->
   <div class="section-nav">
     <button class="sec-btn" onclick="jumpTo(0)">① Init</button>
     <button class="sec-btn" onclick="jumpTo(1)">② Pick p0</button>
@@ -612,12 +553,8 @@ code {
 </header>
 
 <div class="main-container">
-
-  <!-- VIZ -->
   <div class="viz-panel">
     <svg id="viz" width="780" height="420" viewBox="0 0 780 420">
-
-      <!-- Cluster 1 connection lines -->
       <line class="connection-line" id="conn-0-1"  x1="220" y1="230" x2="250" y2="210"/>
       <line class="connection-line" id="conn-0-2"  x1="220" y1="230" x2="250" y2="250"/>
       <line class="connection-line" id="conn-0-3"  x1="220" y1="230" x2="220" y2="270"/>
@@ -635,8 +572,6 @@ code {
       <line class="connection-line" id="conn-5-10" x1="190" y1="210" x2="150" y2="190"/>
       <line class="connection-line" id="conn-5-11" x1="190" y1="210" x2="220" y2="180"/>
       <line class="connection-line" id="conn-0-11" x1="220" y1="230" x2="220" y2="180"/>
-
-      <!-- Cluster 2 connection lines -->
       <line class="connection-line" id="conn-12-13" x1="560" y1="230" x2="590" y2="210"/>
       <line class="connection-line" id="conn-12-14" x1="560" y1="230" x2="590" y2="250"/>
       <line class="connection-line" id="conn-12-15" x1="560" y1="230" x2="560" y2="270"/>
@@ -655,7 +590,6 @@ code {
       <line class="connection-line" id="conn-17-22" x1="530" y1="210" x2="490" y2="190"/>
       <line class="connection-line" id="conn-17-23" x1="530" y1="210" x2="560" y2="180"/>
 
-      <!-- Density-reachability highlight lines -->
       <line class="density-line" id="dl-1-6"  x1="250" y1="210" x2="290" y2="190" stroke="#00d4ff"/>
       <line class="density-line" id="dl-0-1"  x1="220" y1="230" x2="250" y2="210" stroke="#f5a623"/>
       <line class="density-line" id="dl-1-2"  x1="250" y1="210" x2="250" y2="250" stroke="#f5a623"/>
@@ -664,7 +598,6 @@ code {
       <line class="density-line" id="dl-0-2"  x1="220" y1="230" x2="250" y2="250" stroke="#3fb950"/>
       <line class="density-line" id="dl-2-7"  x1="250" y1="250" x2="290" y2="270" stroke="#3fb950"/>
 
-      <!-- Epsilon circles -->
       <circle class="epsilon-circle" id="eps-0"  cx="220" cy="230" r="45"/>
       <circle class="epsilon-circle" id="eps-1"  cx="250" cy="210" r="45"/>
       <circle class="epsilon-circle" id="eps-2"  cx="250" cy="250" r="45"/>
@@ -696,7 +629,6 @@ code {
       <circle class="epsilon-circle" id="eps-28" cx="700" cy="150" r="45"/>
       <circle class="epsilon-circle" id="eps-29" cx="700" cy="310" r="45"/>
 
-      <!-- Labels -->
       <text class="label-text" id="label-0"  x="220" y="219" text-anchor="middle">Core</text>
       <text class="label-text" id="label-1"  x="250" y="199" text-anchor="middle">Core</text>
       <text class="label-text" id="label-2"  x="250" y="239" text-anchor="middle">Core</text>
@@ -728,7 +660,6 @@ code {
       <text class="label-text" id="label-28" x="700" y="139" text-anchor="middle">Noise</text>
       <text class="label-text" id="label-29" x="700" y="299" text-anchor="middle">Noise</text>
 
-      <!-- Points -->
       <g class="point" id="point-0"  data-state="unvisited" transform="translate(220,230)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-1"  data-state="unvisited" transform="translate(250,210)"><circle class="point-circle" r="7"/></g>
       <g class="point" id="point-2"  data-state="unvisited" transform="translate(250,250)"><circle class="point-circle" r="7"/></g>
@@ -767,7 +698,6 @@ code {
       <div class="progress" id="progress"></div>
       <button class="btn-next" id="btnNext" onclick="nextStep()">Next →</button>
     </div>
-
     <div class="controls" style="margin-top:8px">
       <div class="speed-wrap">
         <span>Speed:</span>
@@ -779,11 +709,9 @@ code {
         </select>
       </div>
     </div>
-
     <div class="hint">← → arrow keys &nbsp;|&nbsp; Space to play/pause</div>
   </div>
 
-  <!-- INFO PANEL -->
   <div class="info-panel">
     <div class="step-badge" id="stepBadge">Step 1 of 16</div>
     <div class="step-title" id="stepTitle">Initialization</div>
@@ -840,12 +768,10 @@ code {
   </div>
 </div>
 
-<!-- VIDEO SECTION -->
+<!-- VIDEO -->
 <div class="video-section">
-  <div class="video-header">
-    <h2>▸ Video Walkthrough</h2>
-    <p>Full animation of the DBSCAN algorithm in action</p>
-  </div>
+  <h2>▸ Video Walkthrough</h2>
+  <p>Full animation of the DBSCAN algorithm in action</p>
   <div class="video-wrapper">
     <video controls preload="metadata">
       <source src="DBSCAN.mp4" type="video/mp4">
@@ -854,7 +780,7 @@ code {
   </div>
 </div>
 
-<!-- PYTHON IMPLEMENTATION SECTION -->
+<!-- PYTHON -->
 <div class="python-section">
   <h2>▸ Python Implementation</h2>
   <p>Two ways to run DBSCAN: from scratch (educational) and via scikit-learn (production).</p>
@@ -864,175 +790,100 @@ code {
     <button class="code-tab" onclick="switchTab('sklearn')">sklearn DBSCAN</button>
   </div>
 
-  <!-- Raw Implementation -->
+  <!-- RAW — fixed algorithm -->
   <div class="code-block active" id="tab-raw">
     <div class="code-header">
       <span>dbscan_from_scratch.py</span>
       <button class="copy-btn" onclick="copyCode('raw')">Copy</button>
     </div>
-    <pre><code><span class="co">#!/usr/bin/env python3</span>
-<span class="co">"""Raw DBSCAN implementation matching the visualization above.</span>
-<span class="co">   ε = 45 (pixel distance), MinPts = 4."""</span>
+    <pre><code><span class="kw">import</span> math
 
-<span class="kw">import</span> math
-<span class="kw">from</span> collections <span class="kw">import</span> deque
-
-
-<span class="kw">def</span> <span class="fn">euclidean</span>(<span class="va">a</span>, <span class="va">b</span>):
-    <span class="co">"""2-D Euclidean distance."""</span>
-    <span class="kw">return</span> math.sqrt((a[<span class="nu">0</span>] - b[<span class="nu">0</span>])**<span class="nu">2</span> + (a[<span class="nu">1</span>] - b[<span class="nu">1</span>])**<span class="nu">2</span>)
-
-
-<span class="kw">def</span> <span class="fn">region_query</span>(<span class="va">points</span>, <span class="va">p_idx</span>, <span class="va">eps</span>):
-    <span class="co">"""Return indices of all points within ε of points[p_idx]."""</span>
-    neighbors = []
-    <span class="kw">for</span> i, q <span class="kw">in</span> <span class="bu">enumerate</span>(points):
-        <span class="kw">if</span> euclidean(points[p_idx], q) <= eps:
-            neighbors.append(i)
-    <span class="kw">return</span> neighbors
-
+<span class="kw">def</span> <span class="fn">region_query</span>(<span class="va">points</span>, <span class="va">p</span>, <span class="va">eps</span>):
+    <span class="co">"""Return indices of all points within eps of points[p]."""</span>
+    <span class="kw">return</span> [i <span class="kw">for</span> i, q <span class="kw">in</span> <span class="bu">enumerate</span>(points)
+            <span class="kw">if</span> math.dist(points[p], q) &lt;= eps]
 
 <span class="kw">def</span> <span class="fn">dbscan</span>(<span class="va">points</span>, <span class="va">eps</span>, <span class="va">min_pts</span>):
-    <span class="co">"""</span>
-<span class="co">    Returns:</span>
-<span class="co">        labels : list[int]  —  cluster id or -1 for noise</span>
-<span class="co">        types  : list[str]  —  'core', 'border', or 'noise'</span>
-<span class="co">    """</span>
-    n = <span class="bu">len</span>(points)
-    labels = [<span class="op">-</span><span class="nu">1</span>] * n          <span class="co"># -1 = unvisited / noise</span>
-    types  = [<span class="st">'noise'</span>] * n
-    visited = [<span class="va">False</span>] * n
+    labels  = [<span class="op">-</span><span class="nu">1</span>] * <span class="bu">len</span>(points)   <span class="co"># -1 = noise</span>
+    visited = [<span class="va">False</span>] * <span class="bu">len</span>(points)
     cluster_id = <span class="nu">0</span>
 
-    <span class="kw">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(points)):
         <span class="kw">if</span> visited[i]:
             <span class="kw">continue</span>
-
         visited[i] = <span class="va">True</span>
         neighbors = region_query(points, i, eps)
 
-        <span class="co"># ── Not enough neighbors → mark as noise (for now) ──</span>
-        <span class="kw">if</span> <span class="bu">len</span>(neighbors) < min_pts:
-            labels[i] = <span class="op">-</span><span class="nu">1</span>
+        <span class="kw">if</span> <span class="bu">len</span>(neighbors) &lt; min_pts:
+            labels[i] = <span class="op">-</span><span class="nu">1</span>          <span class="co"># mark noise for now</span>
             <span class="kw">continue</span>
 
-        <span class="co"># ── Core point found → start a new cluster ──</span>
-        types[i] = <span class="st">'core'</span>
+        <span class="co"># i is a core point — start new cluster</span>
         labels[i] = cluster_id
+        queue = [n <span class="kw">for</span> n <span class="kw">in</span> neighbors <span class="kw">if</span> n != i]
 
-        <span class="co"># Frontier queue of points to expand</span>
-        frontier = deque(neighbors)
-        j = <span class="nu">0</span>
-        <span class="kw">while</span> j < <span class="bu">len</span>(frontier):
-            q_idx = frontier[j]
-            j += <span class="nu">1</span>
-
-            <span class="kw">if</span> labels[q_idx] == <span class="op">-</span><span class="nu">1</span>:
-                <span class="co"># Was previously marked noise → now border</span>
-                labels[q_idx] = cluster_id
-                types[q_idx] = <span class="st">'border'</span>
-
-            <span class="kw">if</span> visited[q_idx]:
-                <span class="kw">continue</span>
-
-            visited[q_idx] = <span class="va">True</span>
-            q_neighbors = region_query(points, q_idx, eps)
-
-            <span class="kw">if</span> <span class="bu">len</span>(q_neighbors) >= min_pts:
-                <span class="co"># q is also core → expand frontier</span>
-                types[q_idx] = <span class="st">'core'</span>
-                <span class="kw">for</span> nb <span class="kw">in</span> q_neighbors:
-                    <span class="kw">if</span> nb <span class="op">not</span> <span class="kw">in</span> frontier:
-                        frontier.append(nb)
-            <span class="kw">else</span>:
-                <span class="co"># q is border</span>
-                types[q_idx] = <span class="st">'border'</span>
-                labels[q_idx] = cluster_id
+        <span class="kw">while</span> queue:
+            q = queue.pop(<span class="nu">0</span>)
+            <span class="kw">if</span> <span class="op">not</span> visited[q]:
+                visited[q] = <span class="va">True</span>
+                q_neighbors = region_query(points, q, eps)
+                <span class="kw">if</span> <span class="bu">len</span>(q_neighbors) >= min_pts:  <span class="co"># q is also core</span>
+                    queue += [n <span class="kw">for</span> n <span class="kw">in</span> q_neighbors
+                              <span class="kw">if</span> n <span class="op">not</span> <span class="kw">in</span> queue]
+            <span class="kw">if</span> labels[q] == <span class="op">-</span><span class="nu">1</span>:            <span class="co"># unassigned → add to cluster</span>
+                labels[q] = cluster_id
 
         cluster_id += <span class="nu">1</span>
 
-    <span class="kw">return</span> labels, types
+    <span class="kw">return</span> labels
 
 
-<span class="co"># ── Demo with the 30 points from the visualization ──</span>
-<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
-    <span class="co"># Coordinates match the SVG cx/cy values above</span>
-    POINTS = [
-        (<span class="nu">220</span>,<span class="nu">230</span>), (<span class="nu">250</span>,<span class="nu">210</span>), (<span class="nu">250</span>,<span class="nu">250</span>), (<span class="nu">220</span>,<span class="nu">270</span>), (<span class="nu">190</span>,<span class="nu">250</span>),
-        (<span class="nu">190</span>,<span class="nu">210</span>), (<span class="nu">290</span>,<span class="nu">190</span>), (<span class="nu">290</span>,<span class="nu">270</span>), (<span class="nu">220</span>,<span class="nu">310</span>), (<span class="nu">150</span>,<span class="nu">270</span>),
-        (<span class="nu">150</span>,<span class="nu">190</span>), (<span class="nu">220</span>,<span class="nu">180</span>), (<span class="nu">560</span>,<span class="nu">230</span>), (<span class="nu">590</span>,<span class="nu">210</span>), (<span class="nu">590</span>,<span class="nu">250</span>),
-        (<span class="nu">560</span>,<span class="nu">270</span>), (<span class="nu">530</span>,<span class="nu">250</span>), (<span class="nu">530</span>,<span class="nu">210</span>), (<span class="nu">630</span>,<span class="nu">190</span>), (<span class="nu">630</span>,<span class="nu">270</span>),
-        (<span class="nu">560</span>,<span class="nu">310</span>), (<span class="nu">490</span>,<span class="nu">270</span>), (<span class="nu">490</span>,<span class="nu">190</span>), (<span class="nu">560</span>,<span class="nu">180</span>), (<span class="nu">390</span>,<span class="nu">100</span>),
-        (<span class="nu">390</span>,<span class="nu">360</span>), (<span class="nu">80</span>, <span class="nu">150</span>), (<span class="nu">80</span>, <span class="nu">310</span>), (<span class="nu">700</span>,<span class="nu">150</span>), (<span class="nu">700</span>,<span class="nu">310</span>)
-    ]
+<span class="co"># ── demo ──</span>
+POINTS = [
+    (<span class="nu">220</span>,<span class="nu">230</span>),(<span class="nu">250</span>,<span class="nu">210</span>),(<span class="nu">250</span>,<span class="nu">250</span>),(<span class="nu">220</span>,<span class="nu">270</span>),(<span class="nu">190</span>,<span class="nu">250</span>),
+    (<span class="nu">190</span>,<span class="nu">210</span>),(<span class="nu">290</span>,<span class="nu">190</span>),(<span class="nu">290</span>,<span class="nu">270</span>),(<span class="nu">220</span>,<span class="nu">310</span>),(<span class="nu">150</span>,<span class="nu">270</span>),
+    (<span class="nu">150</span>,<span class="nu">190</span>),(<span class="nu">220</span>,<span class="nu">180</span>),(<span class="nu">560</span>,<span class="nu">230</span>),(<span class="nu">590</span>,<span class="nu">210</span>),(<span class="nu">590</span>,<span class="nu">250</span>),
+    (<span class="nu">560</span>,<span class="nu">270</span>),(<span class="nu">530</span>,<span class="nu">250</span>),(<span class="nu">530</span>,<span class="nu">210</span>),(<span class="nu">630</span>,<span class="nu">190</span>),(<span class="nu">630</span>,<span class="nu">270</span>),
+    (<span class="nu">560</span>,<span class="nu">310</span>),(<span class="nu">490</span>,<span class="nu">270</span>),(<span class="nu">490</span>,<span class="nu">190</span>),(<span class="nu">560</span>,<span class="nu">180</span>),(<span class="nu">390</span>,<span class="nu">100</span>),
+    (<span class="nu">390</span>,<span class="nu">360</span>),(<span class="nu">80</span>,<span class="nu">150</span>),(<span class="nu">80</span>,<span class="nu">310</span>),(<span class="nu">700</span>,<span class="nu">150</span>),(<span class="nu">700</span>,<span class="nu">310</span>),
+]
 
-    labels, types = dbscan(POINTS, eps=<span class="nu">45</span>, min_pts=<span class="nu">4</span>)
-
-    <span class="bu">print</span>(<span class="st">"Cluster labels :"</span>, labels)
-    <span class="bu">print</span>(<span class="st">"Point types  :"</span>, types)
-    <span class="bu">print</span>(<span class="st">f"Clusters found: {max(labels)+1}"</span>)</code></pre>
+labels = dbscan(POINTS, eps=<span class="nu">45</span>, min_pts=<span class="nu">4</span>)
+<span class="bu">print</span>(labels)
+<span class="co"># clusters: 2, noise points (label -1): 6</span></code></pre>
   </div>
 
-  <!-- sklearn Implementation -->
+  <!-- SKLEARN — concise -->
   <div class="code-block" id="tab-sklearn">
     <div class="code-header">
       <span>sklearn_dbscan.py</span>
       <button class="copy-btn" onclick="copyCode('sklearn')">Copy</button>
     </div>
-    <pre><code><span class="co">#!/usr/bin/env python3</span>
-<span class="co">"""Production DBSCAN using scikit-learn."""</span>
-
-<span class="kw">import</span> numpy <span class="kw">as</span> np
+    <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
 <span class="kw">from</span> sklearn.cluster <span class="kw">import</span> DBSCAN
 
-
-<span class="co"># ── 1. Build the same 30-point dataset ──</span>
 POINTS = np.array([
-    [<span class="nu">220</span>,<span class="nu">230</span>], [<span class="nu">250</span>,<span class="nu">210</span>], [<span class="nu">250</span>,<span class="nu">250</span>], [<span class="nu">220</span>,<span class="nu">270</span>], [<span class="nu">190</span>,<span class="nu">250</span>],
-    [<span class="nu">190</span>,<span class="nu">210</span>], [<span class="nu">290</span>,<span class="nu">190</span>], [<span class="nu">290</span>,<span class="nu">270</span>], [<span class="nu">220</span>,<span class="nu">310</span>], [<span class="nu">150</span>,<span class="nu">270</span>],
-    [<span class="nu">150</span>,<span class="nu">190</span>], [<span class="nu">220</span>,<span class="nu">180</span>], [<span class="nu">560</span>,<span class="nu">230</span>], [<span class="nu">590</span>,<span class="nu">210</span>], [<span class="nu">590</span>,<span class="nu">250</span>],
-    [<span class="nu">560</span>,<span class="nu">270</span>], [<span class="nu">530</span>,<span class="nu">250</span>], [<span class="nu">530</span>,<span class="nu">210</span>], [<span class="nu">630</span>,<span class="nu">190</span>], [<span class="nu">630</span>,<span class="nu">270</span>],
-    [<span class="nu">560</span>,<span class="nu">310</span>], [<span class="nu">490</span>,<span class="nu">270</span>], [<span class="nu">490</span>,<span class="nu">190</span>], [<span class="nu">560</span>,<span class="nu">180</span>], [<span class="nu">390</span>,<span class="nu">100</span>],
-    [<span class="nu">390</span>,<span class="nu">360</span>], [<span class="nu">80</span>, <span class="nu">150</span>], [<span class="nu">80</span>, <span class="nu">310</span>], [<span class="nu">700</span>,<span class="nu">150</span>], [<span class="nu">700</span>,<span class="nu">310</span>]
+    [<span class="nu">220</span>,<span class="nu">230</span>],[<span class="nu">250</span>,<span class="nu">210</span>],[<span class="nu">250</span>,<span class="nu">250</span>],[<span class="nu">220</span>,<span class="nu">270</span>],[<span class="nu">190</span>,<span class="nu">250</span>],
+    [<span class="nu">190</span>,<span class="nu">210</span>],[<span class="nu">290</span>,<span class="nu">190</span>],[<span class="nu">290</span>,<span class="nu">270</span>],[<span class="nu">220</span>,<span class="nu">310</span>],[<span class="nu">150</span>,<span class="nu">270</span>],
+    [<span class="nu">150</span>,<span class="nu">190</span>],[<span class="nu">220</span>,<span class="nu">180</span>],[<span class="nu">560</span>,<span class="nu">230</span>],[<span class="nu">590</span>,<span class="nu">210</span>],[<span class="nu">590</span>,<span class="nu">250</span>],
+    [<span class="nu">560</span>,<span class="nu">270</span>],[<span class="nu">530</span>,<span class="nu">250</span>],[<span class="nu">530</span>,<span class="nu">210</span>],[<span class="nu">630</span>,<span class="nu">190</span>],[<span class="nu">630</span>,<span class="nu">270</span>],
+    [<span class="nu">560</span>,<span class="nu">310</span>],[<span class="nu">490</span>,<span class="nu">270</span>],[<span class="nu">490</span>,<span class="nu">190</span>],[<span class="nu">560</span>,<span class="nu">180</span>],[<span class="nu">390</span>,<span class="nu">100</span>],
+    [<span class="nu">390</span>,<span class="nu">360</span>],[<span class="nu">80</span>,<span class="nu">150</span>],[<span class="nu">80</span>,<span class="nu">310</span>],[<span class="nu">700</span>,<span class="nu">150</span>],[<span class="nu">700</span>,<span class="nu">310</span>],
 ])
 
-<span class="co"># ── 2. Fit DBSCAN ──</span>
-<span class="co"># eps=45 matches the ε-circle radius in the visualization.</span>
-<span class="co"># min_samples=4 matches MinPts (including the point itself).</span>
-clustering = DBSCAN(eps=<span class="nu">45</span>, min_samples=<span class="nu">4</span>).fit(POINTS)
+db = DBSCAN(eps=<span class="nu">45</span>, min_samples=<span class="nu">4</span>).fit(POINTS)
+labels = db.labels_   <span class="co"># -1 = noise</span>
 
-labels = clustering.labels_   <span class="co"># -1 == noise</span>
-
-<span class="co"># ── 3. Inspect results ──</span>
 n_clusters = <span class="bu">len</span>(<span class="bu">set</span>(labels)) - (<span class="nu">1</span> <span class="kw">if</span> <span class="op">-</span><span class="nu">1</span> <span class="kw">in</span> labels <span class="kw">else</span> <span class="nu">0</span>)
-n_noise    = <span class="bu">list</span>(labels).count(<span class="op">-</span><span class="nu">1</span>)
+n_noise    = (labels == <span class="op">-</span><span class="nu">1</span>).sum()
 
-<span class="bu">print</span>(<span class="st">f"Estimated clusters : {n_clusters}"</span>)   <span class="co"># → 2</span>
-<span class="bu">print</span>(<span class="st">f"Noise points      : {n_noise}"</span>)        <span class="co"># → 6</span>
-<span class="bu">print</span>(<span class="st">"Labels per point  :"</span>, labels)
+<span class="bu">print</span>(<span class="st">f"Clusters: {n_clusters}"</span>)   <span class="co"># 2</span>
+<span class="bu">print</span>(<span class="st">f"Noise:    {n_noise}"</span>)       <span class="co"># 6</span>
+<span class="bu">print</span>(<span class="st">f"Labels:   {labels}"</span>)
 
-<span class="co"># ── 4. (Optional) Core-sample indices ──</span>
-<span class="co"># sklearn exposes which points were used as "core" internally.</span>
-core_mask = np.zeros_like(labels, dtype=<span class="bu">bool</span>)
-core_mask[clustering.core_sample_indices_] = <span class="va">True</span>
-
-<span class="bu">print</span>(<span class="st">"\nCore point mask   :"</span>, core_mask.astype(<span class="bu">int</span>))
-
-<span class="co"># ── 5. Predict on new data (using nearest cluster) ──</span>
-<span class="co"># DBSCAN itself is not inductive, but we can assign new points</span>
-<span class="co"># to the nearest existing cluster label manually:</span>
-<span class="kw">from</span> sklearn.neighbors <span class="kw">import</span> NearestNeighbors
-
-nn = NearestNeighbors(n_neighbors=<span class="nu">1</span>).fit(POINTS[labels != <span class="op">-</span><span class="nu">1</span>])
-new_pts = np.array([[<span class="nu">230</span>, <span class="nu">220</span>], [<span class="nu">600</span>, <span class="nu">200</span>], [<span class="nu">50</span>, <span class="nu">50</span>]])  <span class="co"># last one is far away</span>
-_, idx = nn.kneighbors(new_pts)
-new_labels = labels[labels != <span class="op">-</span><span class="nu">1</span>][idx.ravel()]
-
-<span class="co"># Re-mark obvious outliers as noise via a distance threshold</span>
-distances, _ = nn.kneighbors(new_pts)
-new_labels[distances.ravel() > <span class="nu">45</span>] = <span class="op">-</span><span class="nu">1</span>
-
-<span class="bu">print</span>(<span class="st">"\nNew point labels  :"</span>, new_labels)</code></pre>
+<span class="co"># which points are core points</span>
+core_mask = np.zeros(<span class="bu">len</span>(POINTS), dtype=<span class="bu">bool</span>)
+core_mask[db.core_sample_indices_] = <span class="va">True</span></code></pre>
   </div>
 </div>
 
@@ -1068,12 +919,11 @@ for (let i = 0; i < 30; i++) {
   else CLASS[i] = 'noise';
 }
 
-// Helpers
-function pt(i)  { return document.getElementById(`point-${i}`); }
-function eps(i) { return document.getElementById(`eps-${i}`); }
-function lbl(i) { return document.getElementById(`label-${i}`); }
+function pt(i)    { return document.getElementById(`point-${i}`); }
+function eps(i)   { return document.getElementById(`eps-${i}`); }
+function lbl(i)   { return document.getElementById(`label-${i}`); }
 function conn(id) { return document.getElementById(id); }
-function dl(id) { return document.getElementById(id); }
+function dl(id)   { return document.getElementById(id); }
 
 function setState(i, state) {
   const el = pt(i);
@@ -1090,13 +940,9 @@ function setActive(i) {
 
 function resetAll() {
   for (let i = 0; i < 30; i++) setState(i, 'unvisited');
-  document.querySelectorAll('.epsilon-circle').forEach(e => {
-    e.classList.remove('visible', 'animate-in');
-  });
+  document.querySelectorAll('.epsilon-circle').forEach(e => e.classList.remove('visible','animate-in'));
   document.querySelectorAll('.connection-line').forEach(e => e.classList.remove('visible'));
-  document.querySelectorAll('.density-line').forEach(e => {
-    e.classList.remove('visible', 'delay1', 'delay2', 'delay3');
-  });
+  document.querySelectorAll('.density-line').forEach(e => e.classList.remove('visible','delay1','delay2','delay3'));
   document.querySelectorAll('.label-text').forEach(e => e.classList.remove('visible'));
   hideNeighborBadge();
   showFF(false);
@@ -1104,13 +950,10 @@ function resetAll() {
 }
 
 function showEpsAnimated(...ids) {
-  document.querySelectorAll('.epsilon-circle').forEach(e => {
-    e.classList.remove('visible', 'animate-in');
-  });
+  document.querySelectorAll('.epsilon-circle').forEach(e => e.classList.remove('visible','animate-in'));
   ids.forEach(i => {
     const el = eps(i);
     if (!el) return;
-    // Trigger reflow to restart animation
     void el.offsetWidth;
     el.classList.add('animate-in');
     setTimeout(() => { el.classList.remove('animate-in'); el.classList.add('visible'); }, 460);
@@ -1118,7 +961,7 @@ function showEpsAnimated(...ids) {
 }
 
 function showEps(...ids) {
-  document.querySelectorAll('.epsilon-circle').forEach(e => e.classList.remove('visible', 'animate-in'));
+  document.querySelectorAll('.epsilon-circle').forEach(e => e.classList.remove('visible','animate-in'));
   ids.forEach(i => eps(i) && eps(i).classList.add('visible'));
 }
 
@@ -1128,10 +971,7 @@ function showConns(ids) {
 }
 
 function showDLAnimated(...specs) {
-  // specs: [{id, delay}]
-  document.querySelectorAll('.density-line').forEach(e => {
-    e.classList.remove('visible', 'delay1', 'delay2', 'delay3');
-  });
+  document.querySelectorAll('.density-line').forEach(e => e.classList.remove('visible','delay1','delay2','delay3'));
   specs.forEach(({id, delay}) => {
     const el = dl(id);
     if (!el) return;
@@ -1151,14 +991,9 @@ function showLabels(...ids) {
   ids.forEach(i => lbl(i) && lbl(i).classList.add('visible'));
 }
 
-function dimAll() {
-  for (let i = 0; i < 30; i++) pt(i).dataset.dim = 'true';
-}
+function dimAll() { for (let i = 0; i < 30; i++) pt(i).dataset.dim = 'true'; }
 function highlight(...ids) {
-  ids.forEach(i => {
-    pt(i).dataset.dim = 'false';
-    pt(i).dataset.highlight = 'true';
-  });
+  ids.forEach(i => { pt(i).dataset.dim = 'false'; pt(i).dataset.highlight = 'true'; });
 }
 
 function showNeighborBadge(pointIdx) {
@@ -1184,15 +1019,12 @@ function showNeighborBadge(pointIdx) {
   }
 }
 
-function hideNeighborBadge() {
-  document.getElementById('nbrCard').classList.remove('visible');
-}
+function hideNeighborBadge() { document.getElementById('nbrCard').classList.remove('visible'); }
 function showFF(v) {
   const el = document.getElementById('ffNotice');
   v ? el.classList.add('visible') : el.classList.remove('visible');
 }
 
-// Live stats counter
 function updateStats() {
   let core = 0, border = 0, noise = 0, unvisited = 0;
   for (let i = 0; i < 30; i++) {
@@ -1202,260 +1034,188 @@ function updateStats() {
     else if (s === 'noise') noise++;
     else unvisited++;
   }
-  // Count frontier separately — it will become core/border
   document.getElementById('statCore').textContent = core;
   document.getElementById('statBorder').textContent = border;
   document.getElementById('statNoise').textContent = noise;
   document.getElementById('statUnvisited').textContent = unvisited;
 }
 
-// Section nav highlight
 function updateSectionNav(stepIdx) {
   const btns = document.querySelectorAll('.sec-btn');
   const sections = [0, 1, 2, 3, 6, 8, 10, 11, 12];
   let active = 0;
-  for (let i = 0; i < sections.length; i++) {
-    if (stepIdx >= sections[i]) active = i;
-  }
+  for (let i = 0; i < sections.length; i++) { if (stepIdx >= sections[i]) active = i; }
   btns.forEach((b, i) => b.classList.toggle('active', i === active));
 }
 
-// ── STEPS ──────────────────────────────────────────────────────────────────
 const STEPS = [
   {
     title: 'Dataset Overview',
-    desc: '30 points sit in 2D space: two dense clusters (left and right) plus 6 scattered noise points. DBSCAN will discover the clusters purely from local density — without being told how many clusters exist.',
+    desc: '30 points in 2D space: two dense clusters (left and right) plus 6 scattered noise points. DBSCAN will discover the clusters purely from local density — without being told how many clusters exist.',
     phase: 'Setup', examine: '—',
     run() { resetAll(); }
   },
   {
     title: 'Pick a Starting Point',
-    desc: 'DBSCAN selects an unvisited point — here <strong>p0</strong> (center-left cluster). We draw its <span class="hl-cyan">epsilon (ε) circle</span>. Anything inside this radius is a neighbor of p0. We count them to decide what kind of point p0 is.',
+    desc: 'DBSCAN selects an unvisited point — here <strong>p0</strong>. We draw its <span class="hl-cyan">epsilon (ε) circle</span>. Any point inside this radius is a neighbor of p0. We count them to decide what kind of point p0 is.',
     phase: 'Cluster 1', examine: 'p0',
     run() {
-      resetAll();
-      setActive(0);
-      showEpsAnimated(0);
-      showNeighborBadge(0);
-      updateStats();
+      resetAll(); setActive(0); showEpsAnimated(0); showNeighborBadge(0); updateStats();
     }
   },
   {
     title: 'p0 is a Core Point',
-    desc: 'Inside p0\'s ε-circle: <strong>5 neighbors</strong> — p1, p2, p3, p4, p5. With p0 itself = 6 points ≥ MinPts = 4. p0 is a <span class="hl-core">Core Point</span>. All unvisited neighbors enter the <span class="hl-green">frontier queue</span> to be explored next.',
+    desc: 'Inside p0\'s ε-circle: <strong>5 neighbors</strong> — p1, p2, p3, p4, p5. With p0 itself = 6 ≥ MinPts = 4. p0 is a <span class="hl-core">Core Point</span>. All neighbors enter the <span class="hl-green">frontier queue</span> to be explored next.',
     phase: 'Cluster 1', examine: 'p0 → Core',
     run() {
-      resetAll();
-      setState(0, 'core');
+      resetAll(); setState(0, 'core');
       showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5']);
       [1,2,3,4,5].forEach(i => setState(i, 'frontier'));
-      showLabels(0);
-      updateStats();
+      showLabels(0); updateStats();
     }
   },
   {
     title: 'Examine Next: p1',
-    desc: 'We dequeue <strong>p1</strong> from the frontier. Its ε-circle contains <strong>4 neighbors</strong>: p0, p2, p5, p6. With itself = 5 ≥ MinPts. p1 is also a <span class="hl-core">Core Point</span>.',
+    desc: 'Dequeue <strong>p1</strong> from the frontier. Its ε-circle contains <strong>4 neighbors</strong>: p0, p2, p5, p6. With itself = 5 ≥ MinPts. p1 is also a <span class="hl-core">Core Point</span>.',
     phase: 'Cluster 1', examine: 'p1',
     run() {
-      setState(0, 'core');
-      setActive(1);
-      [2,3,4,5].forEach(i => setState(i, 'frontier'));
-      setState(0, 'core');
+      setState(0, 'core'); setActive(1); [2,3,4,5].forEach(i => setState(i, 'frontier'));
       showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5']);
-      showEpsAnimated(1);
-      showLabels(0);
-      showNeighborBadge(1);
-      updateStats();
+      showEpsAnimated(1); showLabels(0); showNeighborBadge(1); updateStats();
     }
   },
   {
     title: 'p1 Confirmed Core — p6 Added',
-    desc: 'p1 is confirmed <span class="hl-core">Core</span>. Its new unvisited neighbor <strong>p6</strong> joins the frontier. p0 is already classified so it is not re-queued. The cluster keeps expanding through density-reachable core points.',
+    desc: 'p1 is confirmed <span class="hl-core">Core</span>. New unvisited neighbor <strong>p6</strong> joins the frontier. p0 is already assigned so it is not re-queued. The cluster expands through density-reachable core points.',
     phase: 'Cluster 1', examine: 'p1 → Core',
     run() {
       setState(0, 'core'); setState(1, 'core');
       showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6']);
       [2,3,4,5,6].forEach(i => setState(i, 'frontier'));
-      showLabels(0, 1);
-      updateStats();
+      showLabels(0, 1); updateStats();
     }
   },
   {
     title: 'Examine Next: p2',
-    desc: 'We dequeue <strong>p2</strong>. Its ε-circle holds <strong>4 neighbors</strong>: p0, p1, p3, p7. p2 is a <span class="hl-core">Core Point</span>. New unvisited neighbor <strong>p7</strong> is added to the frontier.',
+    desc: 'Dequeue <strong>p2</strong>. Its ε-circle holds <strong>4 neighbors</strong>: p0, p1, p3, p7. p2 is a <span class="hl-core">Core Point</span>. New neighbor <strong>p7</strong> is added to the frontier.',
     phase: 'Cluster 1', examine: 'p2',
     run() {
-      setState(0, 'core'); setState(1, 'core');
-      setActive(2);
+      setState(0, 'core'); setState(1, 'core'); setActive(2);
       [3,4,5,6,7].forEach(i => setState(i, 'frontier'));
-      setState(0, 'core'); setState(1, 'core');
       showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6','conn-2-3','conn-2-7']);
-      showEpsAnimated(2);
-      showLabels(0, 1);
-      showNeighborBadge(2);
-      updateStats();
+      showEpsAnimated(2); showLabels(0, 1); showNeighborBadge(2); updateStats();
     }
   },
   {
     title: 'Examine Next: p6 — Border Point',
-    desc: 'We dequeue <strong>p6</strong>, sitting on the outer edge. Its ε-circle contains only <strong>1 neighbor</strong> (p1). With itself = 2 — less than MinPts = 4. p6 cannot be a core point. But it IS within ε of core point p1, so it is a <span class="hl-border">Border Point</span> — it belongs to the cluster but cannot expand it.',
+    desc: 'Dequeue <strong>p6</strong> on the outer edge. Its ε-circle contains only <strong>1 neighbor</strong> (p1). With itself = 2 &lt; MinPts = 4. p6 is not a core point. But it is within ε of core p1, so it becomes a <span class="hl-border">Border Point</span> — belongs to the cluster but cannot expand it.',
     phase: 'Cluster 1', examine: 'p6 → Border',
     run() {
-      setState(0, 'core'); setState(1, 'core'); setState(2, 'core');
-      setActive(6);
+      setState(0, 'core'); setState(1, 'core'); setState(2, 'core'); setActive(6);
       showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6','conn-2-3','conn-2-7']);
       [3,4,5,7].forEach(i => setState(i, 'frontier'));
-      showEpsAnimated(6);
-      showLabels(0, 1, 2);
-      showNeighborBadge(6);
-      updateStats();
+      showEpsAnimated(6); showLabels(0, 1, 2); showNeighborBadge(6); updateStats();
     }
   },
   {
     title: 'Examine Next: p7 — Border Point',
-    desc: 'p6 is labeled <span class="hl-border">Border</span>. Now we dequeue <strong>p7</strong>. Same result: 1 neighbor (p2). 2 points total < MinPts. Also a <span class="hl-border">Border Point</span>. Border points define the outer shell of the cluster.',
+    desc: 'p6 is labeled <span class="hl-border">Border</span>. Dequeue <strong>p7</strong>. Same result: 1 neighbor (p2), 2 total &lt; MinPts. Also a <span class="hl-border">Border Point</span>. Border points form the outer shell of the cluster.',
     phase: 'Cluster 1', examine: 'p7 → Border',
     run() {
-      setState(0, 'core'); setState(1, 'core'); setState(2, 'core');
-      setState(6, 'border');
-      setActive(7);
+      setState(0, 'core'); setState(1, 'core'); setState(2, 'core'); setState(6, 'border'); setActive(7);
       showConns(['conn-0-1','conn-0-2','conn-0-3','conn-0-4','conn-0-5','conn-1-2','conn-1-5','conn-1-6','conn-2-3','conn-2-7']);
       [3,4,5].forEach(i => setState(i, 'frontier'));
-      showEpsAnimated(7);
-      showLabels(0, 1, 2, 6);
-      showNeighborBadge(7);
-      updateStats();
+      showEpsAnimated(7); showLabels(0, 1, 2, 6); showNeighborBadge(7); updateStats();
     }
   },
   {
     title: 'Cluster 1 — Fully Classified',
-    desc: 'p3, p4, p5 are all <span class="hl-core">Core</span> (≥ 3 neighbors each). Their border neighbors p8–p11 are classified too. <strong>6 core points</strong> form the dense backbone, <strong>6 border points</strong> define the outer edge.',
+    desc: 'p3, p4, p5 are all <span class="hl-core">Core</span> (≥ 3 neighbors each). Their outer neighbors p8–p11 are <span class="hl-border">Border</span>. <strong>6 core points</strong> form the backbone, <strong>6 border points</strong> define the edge.',
     phase: 'Cluster 1', examine: 'Complete',
     run() {
-      C1.forEach(i => setState(i, CLASS[i]));
-      showConns(C1_CONNS);
-      showLabels(...C1);
-      hideNeighborBadge();
-      showFF(true);
-      updateStats();
+      C1.forEach(i => setState(i, CLASS[i])); showConns(C1_CONNS);
+      showLabels(...C1); hideNeighborBadge(); showFF(true); updateStats();
     }
   },
   {
     title: 'Cluster 1 Complete',
-    desc: 'All 12 points of <span class="hl-c1">Cluster 1</span> are painted amber — core and border alike. DBSCAN moves on to the next unvisited point. Cluster 2 and the isolated noise points are still unvisited.',
+    desc: 'All 12 points of <span class="hl-c1">Cluster 1</span> are painted amber. DBSCAN moves on to the next unvisited point. Cluster 2 and noise points are still unvisited.',
     phase: 'Cluster 1 ✓', examine: 'Done',
     run() {
-      C1.forEach(i => setState(i, 'c1'));
-      showConns(C1_CONNS);
-      showLabels(...C1);
-      showFF(false);
-      updateStats();
+      C1.forEach(i => setState(i, 'c1')); showConns(C1_CONNS);
+      showLabels(...C1); showFF(false); updateStats();
     }
   },
   {
     title: 'Cluster 2 Discovered',
-    desc: 'DBSCAN picks the next unvisited point in the right group and expands it the same way: 6 <span class="hl-core">core points</span> with ≥ 3 neighbors each, 6 <span class="hl-border">border points</span>. All 12 form <span class="hl-c2">Cluster 2</span> — found without ever being told the cluster count.',
+    desc: 'DBSCAN picks the next unvisited point in the right group and expands it identically: 6 <span class="hl-core">core points</span>, 6 <span class="hl-border">border points</span>. All 12 form <span class="hl-c2">Cluster 2</span> — found without knowing the cluster count.',
     phase: 'Cluster 2 ✓', examine: 'Done',
     run() {
-      C1.forEach(i => setState(i, 'c1'));
-      C2.forEach(i => setState(i, 'c2'));
-      showConns([...C1_CONNS, ...C2_CONNS]);
-      showLabels(...C1, ...C2);
-      hideNeighborBadge();
-      showFF(false);
-      updateStats();
+      C1.forEach(i => setState(i, 'c1')); C2.forEach(i => setState(i, 'c2'));
+      showConns([...C1_CONNS, ...C2_CONNS]); showLabels(...C1, ...C2);
+      hideNeighborBadge(); showFF(false); updateStats();
     }
   },
   {
     title: 'Noise Points Labeled Last',
-    desc: 'Only after all clusters are fully formed does DBSCAN visit the 6 isolated points. Each ε-circle is nearly empty — 1 point total (itself), far below MinPts = 4. None is within ε of any core point. <strong>Noise is a residual label</strong>, assigned only after the algorithm exhausts all density-reachable paths.',
+    desc: 'After all clusters are formed, DBSCAN visits the 6 isolated points. Each ε-circle contains only itself — far below MinPts = 4. None is within ε of any core point. <strong>Noise is a residual label</strong> assigned at the very end.',
     phase: 'Noise ✓', examine: 'p24–p29',
     run() {
-      C1.forEach(i => setState(i, 'c1'));
-      C2.forEach(i => setState(i, 'c2'));
+      C1.forEach(i => setState(i, 'c1')); C2.forEach(i => setState(i, 'c2'));
       NOISE.forEach(i => setState(i, 'noise'));
-      showConns([...C1_CONNS, ...C2_CONNS]);
-      showEps(24, 25, 26, 27, 28, 29);
-      showLabels(...C1, ...C2, ...NOISE);
-      hideNeighborBadge();
-      updateStats();
+      showConns([...C1_CONNS, ...C2_CONNS]); showEps(24, 25, 26, 27, 28, 29);
+      showLabels(...C1, ...C2, ...NOISE); hideNeighborBadge(); updateStats();
     }
   },
   {
     title: 'Concept: Directly Density-Reachable',
-    desc: '<strong>Directly density-reachable:</strong> point q is directly density-reachable from core point p if q falls inside p\'s ε-circle. Here, border point <strong>p6</strong> is directly density-reachable from core <strong>p1</strong> — p6 lies within p1\'s ε-radius. The animated <span class="hl-cyan">cyan line</span> shows this direct connection.',
+    desc: '<strong>Directly density-reachable:</strong> q is directly density-reachable from core point p if q is inside p\'s ε-circle. Here, border <strong>p6</strong> is directly density-reachable from core <strong>p1</strong>. The <span class="hl-cyan">cyan line</span> shows this direct link.',
     phase: 'Concepts', examine: 'p1 → p6',
     run() {
-      C1.forEach(i => setState(i, CLASS[i]));
-      C2.forEach(i => setState(i, CLASS[i]));
-      NOISE.forEach(i => setState(i, 'noise'));
-      showConns([...C1_CONNS, ...C2_CONNS]);
-      dimAll();
-      highlight(1, 6);
-      showDLAnimated({id:'dl-1-6', delay:0});
-      showLabels(1, 6);
-      updateStats();
+      C1.forEach(i => setState(i, CLASS[i])); C2.forEach(i => setState(i, CLASS[i]));
+      NOISE.forEach(i => setState(i, 'noise')); showConns([...C1_CONNS, ...C2_CONNS]);
+      dimAll(); highlight(1, 6); showDLAnimated({id:'dl-1-6', delay:0});
+      showLabels(1, 6); updateStats();
     }
   },
   {
     title: 'Concept: Density-Reachable',
-    desc: '<strong>Density-reachable:</strong> q is density-reachable from p if there is a chain of core points p→c₁→…→q, each step a direct hop. Here: <strong>p0 → p1 → p2</strong> — each is a core within ε of the next. The chain animates step by step.',
+    desc: '<strong>Density-reachable:</strong> q is density-reachable from p if there is a chain of core points p→c₁→…→q, each step a direct hop. Here: <strong>p0 → p1 → p2</strong>. The chain animates step by step.',
     phase: 'Concepts', examine: 'p0→p1→p2',
     run() {
-      C1.forEach(i => setState(i, CLASS[i]));
-      C2.forEach(i => setState(i, CLASS[i]));
-      NOISE.forEach(i => setState(i, 'noise'));
-      showConns([...C1_CONNS, ...C2_CONNS]);
-      dimAll();
-      highlight(0, 1, 2);
+      C1.forEach(i => setState(i, CLASS[i])); C2.forEach(i => setState(i, CLASS[i]));
+      NOISE.forEach(i => setState(i, 'noise')); showConns([...C1_CONNS, ...C2_CONNS]);
+      dimAll(); highlight(0, 1, 2);
       showDLAnimated({id:'dl-0-1', delay:0}, {id:'dl-1-2', delay:1});
-      showLabels(0, 1, 2);
-      updateStats();
+      showLabels(0, 1, 2); updateStats();
     }
   },
   {
     title: 'Concept: Density-Connected',
-    desc: '<strong>Density-connected:</strong> two points are density-connected if there exists a core point from which both are density-reachable. Core <strong>p0</strong> reaches <strong>p6</strong> via p0→p1→p6 and reaches <strong>p7</strong> via p0→p2→p7. Both chains radiate from p0 — so p6 and p7 belong to the same cluster.',
+    desc: '<strong>Density-connected:</strong> two points are density-connected if a core point can reach both via density-reachability. Core <strong>p0</strong> reaches <strong>p6</strong> via p0→p1→p6 and <strong>p7</strong> via p0→p2→p7 — so both belong to the same cluster.',
     phase: 'Concepts', examine: 'p6 ↔ p7',
     run() {
-      C1.forEach(i => setState(i, CLASS[i]));
-      C2.forEach(i => setState(i, CLASS[i]));
-      NOISE.forEach(i => setState(i, 'noise'));
-      showConns([...C1_CONNS, ...C2_CONNS]);
-      dimAll();
-      highlight(0, 1, 2, 6, 7);
-      showDLAnimated(
-        {id:'dl-0-1b', delay:0},
-        {id:'dl-1-6b', delay:1},
-        {id:'dl-0-2',  delay:2},
-        {id:'dl-2-7',  delay:3}
-      );
-      showLabels(0, 6, 7);
-      updateStats();
+      C1.forEach(i => setState(i, CLASS[i])); C2.forEach(i => setState(i, CLASS[i]));
+      NOISE.forEach(i => setState(i, 'noise')); showConns([...C1_CONNS, ...C2_CONNS]);
+      dimAll(); highlight(0, 1, 2, 6, 7);
+      showDLAnimated({id:'dl-0-1b',delay:0},{id:'dl-1-6b',delay:1},{id:'dl-0-2',delay:2},{id:'dl-2-7',delay:3});
+      showLabels(0, 6, 7); updateStats();
     }
   },
   {
     title: 'Not Density-Connected Across Clusters',
-    desc: 'Points from different clusters are <strong>never density-connected</strong> — no chain of core points bridges the gap between the two groups. The inter-cluster distance exceeds ε, so DBSCAN separates them correctly with zero prior knowledge of cluster count.',
+    desc: 'Points from different clusters are <strong>never density-connected</strong> — no chain of core points bridges the gap. The inter-cluster distance exceeds ε, so DBSCAN separates them correctly with zero prior knowledge of cluster count.',
     phase: 'Final', examine: 'Summary',
     run() {
-      C1.forEach(i => setState(i, 'c1'));
-      C2.forEach(i => setState(i, 'c2'));
+      C1.forEach(i => setState(i, 'c1')); C2.forEach(i => setState(i, 'c2'));
       NOISE.forEach(i => setState(i, 'noise'));
-      showConns([...C1_CONNS, ...C2_CONNS]);
-      showDL();
-      showLabels(...C1, ...C2, ...NOISE);
-      updateStats();
+      showConns([...C1_CONNS, ...C2_CONNS]); showDL();
+      showLabels(...C1, ...C2, ...NOISE); updateStats();
     }
   }
 ];
 
-// ── PLAYBACK ──────────────────────────────────────────────────────────────
-let cur = 0;
-let playing = false;
-let playTimer = null;
-let playSpeed = 1800;
+let cur = 0, playing = false, playTimer = null, playSpeed = 1800;
 
 function updateSpeed() {
   playSpeed = parseInt(document.getElementById('speedSel').value);
@@ -1470,32 +1230,21 @@ function startPlay() {
 }
 
 function stopPlay() {
-  clearInterval(playTimer);
-  playing = false;
+  clearInterval(playTimer); playing = false;
   const btn = document.getElementById('btnPlay');
-  btn.textContent = '▶ Play';
-  btn.classList.remove('playing');
+  btn.textContent = '▶ Play'; btn.classList.remove('playing');
 }
 
 function togglePlay() {
-  if (playing) {
-    stopPlay();
-  } else {
-    playing = true;
-    const btn = document.getElementById('btnPlay');
-    btn.textContent = '⏸ Pause';
-    btn.classList.add('playing');
-    startPlay();
-  }
+  if (playing) { stopPlay(); return; }
+  playing = true;
+  const btn = document.getElementById('btnPlay');
+  btn.textContent = '⏸ Pause'; btn.classList.add('playing');
+  startPlay();
 }
 
-function jumpTo(stepIdx) {
-  stopPlay();
-  cur = stepIdx;
-  render();
-}
+function jumpTo(stepIdx) { stopPlay(); cur = stepIdx; render(); }
 
-// ── RENDER ────────────────────────────────────────────────────────────────
 function buildProgress() {
   const el = document.getElementById('progress');
   el.innerHTML = '';
@@ -1516,9 +1265,7 @@ function render() {
   document.getElementById('btnPrev').disabled = cur === 0;
   document.getElementById('btnNext').disabled = cur === STEPS.length - 1;
   if (cur === STEPS.length - 1) stopPlay();
-  buildProgress();
-  updateSectionNav(cur);
-  s.run();
+  buildProgress(); updateSectionNav(cur); s.run();
 }
 
 function nextStep() { if (cur < STEPS.length - 1) { cur++; render(); } }
@@ -1530,7 +1277,6 @@ document.addEventListener('keydown', e => {
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
 });
 
-// ── PYTHON TAB & COPY LOGIC ───────────────────────────────────────────────
 function switchTab(tab) {
   document.querySelectorAll('.code-tab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.code-block').forEach(b => b.classList.remove('active'));
@@ -1543,8 +1289,7 @@ function copyCode(tab) {
   navigator.clipboard.writeText(code).then(() => {
     const btn = document.querySelector(`#tab-${tab} .copy-btn`);
     const old = btn.textContent;
-    btn.textContent = 'Copied!';
-    btn.style.color = 'var(--green)';
+    btn.textContent = 'Copied!'; btn.style.color = 'var(--green)';
     setTimeout(() => { btn.textContent = old; btn.style.color = ''; }, 1500);
   });
 }
